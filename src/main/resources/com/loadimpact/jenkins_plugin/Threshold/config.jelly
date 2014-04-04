@@ -1,0 +1,17 @@
+<j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form">
+    <f:entry>
+        <div style="vertical-align: baseline;">
+            IF
+            <f:select field="metric" style="width: 14em;"/>
+            <f:select field="operator" style="width: 4em; text-align: center;"/>
+
+            <f:textbox field="value" value="${it.value}" default="0" style="width: 7em; text-align: right;"/>
+            <f:select field="unit" disabled="true" style="width: 6em; border-width: 0px;"/>
+            THEN mark as
+            <f:select field="result" style="width: 8em; margin-right: 1em;" />
+            <input type="button" value="Delete"
+                   class="repeatable-delete show-if-not-only"
+                   style="vertical-align: bottom;"/>
+        </div>
+    </f:entry>
+</j:jelly>

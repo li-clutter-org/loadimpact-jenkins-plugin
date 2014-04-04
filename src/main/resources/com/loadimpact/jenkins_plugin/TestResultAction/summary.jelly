@@ -1,0 +1,45 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define"
+         xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+
+    <!--<h2>Load-Test Summary</h2>-->
+    <table id="load-impact" class="test-summary">
+        <tbody>
+            <tr>
+                <th colspan="2" class="transparent">
+                    <h2><img src="${resURL}/plugin/${it.pluginName}/img/loadimpact-full-logo-300x50.png" width="150"/> Summary</h2>
+                </th>
+            </tr>
+            <tr tooltip="The name and ID of this load test">
+                <th>Name</th>
+                <td><a href="${it.testConfigurationUrl}" target="_blank">${it.name} (ID ${it.id})</a></td>
+            </tr>
+            <tr tooltip="Which website to direct the load test to.">
+                <th>Target</th>
+                <td>
+                    <a href="${it.targetUrl}">${it.targetUrl}</a>
+                </td>
+            </tr>
+            <tr tooltip="The total elapsed time of running this test">
+                <th>Elapsed Time</th>
+                <td>${it.elapsedTime}</td>
+            </tr>
+            <tr tooltip="User load time (time it takes to execute one repetition of a load script excluding sleep time) at given timestamps">
+                <th>User Load Time</th>
+                <td>${it.responseTime}</td>
+            </tr>
+            <tr tooltip="The maximum number of concurrent users active throughout test.">
+                <th>Clients</th>
+                <td>${it.clientCount}</td>
+            </tr>
+            <tr tooltip="The peak (average) number of requests per second.">
+                <th>Requests</th>
+                <td>${it.requestCountMax} (${it.requestCount}) per seconds</td>
+            </tr>
+            <tr tooltip="The peak (average) bandwidth consumption throughout test.">
+                <th>Bandwidth</th>
+                <td>${it.bandwidthMax} (${it.bandwidth}) Mbit per seconds</td>
+            </tr>
+        </tbody>
+    </table>
+
+</j:jelly>

@@ -1,0 +1,72 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define"
+         xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+
+    <div id="load-impact">
+        <table class="test-config">
+            <tr>
+                <th colspan="2" class="transparent">
+                    <h2>
+                        <img src="${resURL}/plugin/${it.pluginName}/img/loadimpact-full-logo-300x50.png" width="150"/>
+                        Configuration
+                    </h2>
+                </th>
+            </tr>
+            
+            <j:if test="${it.undefinedApiToken}">
+                <tr>
+                    <td colspan="2" class="error-box">
+                        No API token defined. Please configure an API Token via the Credentials settings.
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2" class="transparent">
+                        <i>After that, you might have to save the job configuration again.</i>
+                    </td>
+                </tr>
+            </j:if>
+
+            <j:if test="${it.hasApiToken}">
+                <tr>
+                    <th>Name</th>
+                    <td>
+                        <a href="${it.testConfigurationUrl}" target="_blank">${it.name} (ID ${it.id})</a>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Last Updated</th>
+                    <td>${it.date}</td>
+                </tr>
+                <tr>
+                    <th>Target URL</th>
+                    <td>
+                        <a href="${it.targetUrl}">${it.targetUrl}</a>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Duration</th>
+                    <td>${it.duration}</td>
+                </tr>
+                <tr>
+                    <th>Clients</th>
+                    <td>${it.clients}</td>
+                </tr>
+                <tr>
+                    <th>User Type</th>
+                    <td>${it.userType}</td>
+                </tr>
+                <tr>
+                    <th>Load Zones</th>
+                    <td>
+                        <ul>
+                            <j:forEach items="${it.zones}" var="zone">
+                                <li>${zone.name} = ${zone.percentage}%</li>
+                            </j:forEach>
+                        </ul>
+                    </td>
+                </tr>
+            </j:if>
+        </table>
+    </div>
+
+
+</j:jelly>

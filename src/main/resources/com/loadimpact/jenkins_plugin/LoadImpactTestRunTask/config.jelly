@@ -1,0 +1,47 @@
+<j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form">
+    <f:section title="${%Choose}">
+        <f:entry field="apiTokenId" title="${%ApiToken}">
+            <f:select />
+        </f:entry>
+        <f:entry field="loadTestId" title="${%TestConfig}">
+            <f:select/>
+        </f:entry>
+    </f:section>
+
+    <f:section title="${%Criteria}">
+        <f:entry title="${%StartLooking}">
+            <f:textbox field="criteriaDelayValue" clazz="number" default="0"
+                       style="text-align: right; width: 4em; margin-right: 1em;"/>
+            <f:select field="criteriaDelayUnit" default="seconds" style="width: 8em;"/>
+        </f:entry>
+
+        <f:entry field="criteriaDelayQueueSize" title="${%UseLastNumbers}">
+            <f:textbox clazz="number" default="1" style="text-align: right; width: 4em; margin-right: 1em;"/>
+        </f:entry>
+
+        <f:entry field="abortAtFailure" title="${%AbortIfFailed}">
+            <f:checkbox/>
+            <span style="margin-left: 1em;">${%AbortIfFailedHelp}</span>
+        </f:entry>
+
+        <f:entry>
+            <f:repeatableProperty field="thresholds" add="${%AddThreshold}" header="Threshold" minimum="1"/>
+        </f:entry>
+    </f:section>
+
+    <f:section title="${%HttpSettings}">
+        <f:advanced>
+            <f:entry field="pollInterval" title="${%PollInterval}" description="${%PollIntervalHelp}">
+                <f:textbox clazz="number" default="5"/>
+            </f:entry>
+            <f:entry field="logJson" title="${%ShowJson}"
+                     description="${%ShowJsonHelp}">
+                <f:checkbox/>
+            </f:entry>
+            <f:entry field="logHttp" title="${%ShowHttp}"
+                     description="${%ShowHttpHelp}">
+                <f:checkbox/>
+            </f:entry>
+        </f:advanced>
+    </f:section>
+</j:jelly>
