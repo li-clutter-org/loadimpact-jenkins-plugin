@@ -1,4 +1,8 @@
 <!-- Plugin description (list of plugins) -->
 <div>
-  Provides launch of Load Impact load tests as a job-step.
+    This plugin allows you to run a
+    <a href="https://loadimpact.com/features">LoadImpact</a> 
+    load test as a build-step (or post-build).
+    The source code can be found on
+    <a href="https://github.com/loadimpact/loadimpact-jenkins-plugin">GitHub</a>.
 </div>

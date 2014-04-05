@@ -6,7 +6,7 @@
             <tr>
                 <th colspan="2" class="transparent">
                     <h2>
-                        <img src="${resURL}/plugin/${it.pluginName}/img/loadimpact-full-logo-300x50.png" width="150"/>
+                        <img src="${it.logo}" width="150"/>
                         Configuration
                     </h2>
                 </th>
@@ -67,6 +67,4 @@
             </j:if>
         </table>
     </div>
-
-
 </j:jelly>

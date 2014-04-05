@@ -2,20 +2,42 @@ package com.loadimpact.jenkins_plugin;
 
 import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.domains.DomainRequirement;
-import com.loadimpact.jenkins_plugin.client.*;
+import com.loadimpact.jenkins_plugin.client.LoadImpactClient;
+import com.loadimpact.jenkins_plugin.client.ResultsCategory;
+import com.loadimpact.jenkins_plugin.client.RunningTestListener;
+import com.loadimpact.jenkins_plugin.client.TestConfiguration;
+import com.loadimpact.jenkins_plugin.client.TestInstance;
+import com.loadimpact.jenkins_plugin.client.TestResult;
+import com.loadimpact.jenkins_plugin.client.Util;
 import hudson.AbortException;
 import hudson.Functions;
 import hudson.Launcher;
-import hudson.model.*;
+import hudson.PluginWrapper;
+import hudson.model.AbstractBuild;
+import hudson.model.AbstractProject;
+import hudson.model.Action;
+import hudson.model.BuildListener;
+import hudson.model.Cause;
+import hudson.model.Item;
+import hudson.model.Result;
+import jenkins.model.Jenkins;
 import org.joda.time.format.ISODateTimeFormat;
 
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static com.loadimpact.jenkins_plugin.client.ResultsCategory.*;
+import static com.loadimpact.jenkins_plugin.client.ResultsCategory.bandwidth;
+import static com.loadimpact.jenkins_plugin.client.ResultsCategory.clients_active;
+import static com.loadimpact.jenkins_plugin.client.ResultsCategory.requests_per_second;
+import static com.loadimpact.jenkins_plugin.client.ResultsCategory.user_load_time;
 
 /**
  * Common parts of this plugin, used by both the build and post-build tasks.
@@ -24,7 +46,8 @@ import static com.loadimpact.jenkins_plugin.client.ResultsCategory.*;
  * @date 2013-10-21, 09:06
  */
 public class LoadImpactCore {
-    public static final String PLUGIN_NAME = "Load-Impact-Jenkins-plugin";
+    @Deprecated
+    private static final String PLUGIN_NAME = "LoadImpact-Jenkins-plugin";
 
     /**
      * API token (credentials) ID.
@@ -79,7 +102,7 @@ public class LoadImpactCore {
     /**
      * Jenkins log stream.
      */
-    private transient Logger _log;
+    private static transient Logger _log;
 
     /**
      * Provides a summary of the load-test job.
@@ -226,17 +249,51 @@ public class LoadImpactCore {
      * @param imgName   name of image file
      * @return jenkins URL
      */
+    @Deprecated
     public static String imgUrl(final String imgName) {
         return Functions.getResourcePath() + "/plugin/" + PLUGIN_NAME + "/img/" + imgName;
     }
 
     /**
+     * Reads the proper plugin name from the MANIFEST
+     * @return its name
+     */
+    public static String getPluginName() {
+        try {
+            PluginWrapper plugin = Jenkins.getInstance().getPluginManager().whichPlugin(LoadImpactCore.class);
+            return plugin.getShortName();
+        } catch (Exception e) {
+            log().severe("Failed to get plugin object. " + e);
+            return "NO_PLUGIN_NAME";
+        }
+    }
+
+    /**
+     * Returns a proper url path for a bundled image.
+     * @param name its bare file name
+     * @return its path
+     */
+    public static String imagePath(final String name) {
+        return String.format("%s/plugin/%s/img/%s", Functions.getResourcePath(), getPluginName(), name);
+    }
+
+    /**
+     * Returns a proper url path for a bundled style sheet.
+     * @param name its bare file name
+     * @return its path
+     */
+    public static String cssPath(final String name) {
+        return String.format("%s/plugin/%s/css/%s", Functions.getResourcePath(), getPluginName(), name);
+    }
+    
+
+    /**
      * Returns its logger.
      * @return logger
      */
-    public Logger log() {
+    public static Logger log() {
         if (_log == null) {
-            _log = Logger.getLogger(getClass().getName());
+            _log = Logger.getLogger(LoadImpactCore.class.getName());
         }
         return _log;
     }

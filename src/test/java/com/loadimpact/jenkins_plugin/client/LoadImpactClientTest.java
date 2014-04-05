@@ -2,6 +2,7 @@ package com.loadimpact.jenkins_plugin.client;
 
 import org.junit.Test;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -99,7 +100,7 @@ public class LoadImpactClientTest {
         List<TestResult> results = target.getTestResultsSingle(id, ResultsCategory.clients_active);
         assertThat(results, is(notNullValue()));
         assertThat(results.size(), is(30));
-        assertThat(Util.max(Util.collectInts(results)), is(10));
+        assertThat(Collections.max(Util.collectInts(results)), is(10));
     }
     
     @Test
@@ -115,7 +116,7 @@ public class LoadImpactClientTest {
         List<TestResult> requestsPerSeconds = results.get(ResultsCategory.requests_per_second);
 
         assertThat(clientActive.size(), is(30));
-        assertThat(Util.max(Util.collectInts(clientActive)), is(10));
+        assertThat(Collections.max(Util.collectInts(clientActive)), is(10));
         
         assertThat(requestsPerSeconds.size(), is(30));
     }

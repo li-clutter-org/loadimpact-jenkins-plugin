@@ -6,7 +6,7 @@
         <tbody>
             <tr>
                 <th colspan="2" class="transparent">
-                    <h2><img src="${resURL}/plugin/${it.pluginName}/img/loadimpact-full-logo-300x50.png" width="150"/> Summary</h2>
+                    <h2><img src="${it.logo}" width="150"/> Summary</h2>
                 </th>
             </tr>
             <tr tooltip="The name and ID of this load test">

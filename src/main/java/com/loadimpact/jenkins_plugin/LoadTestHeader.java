@@ -72,10 +72,6 @@ public class LoadTestHeader implements ProminentProjectAction {
         return "https://loadimpact.com/test/config/edit/" + getId();
     }
 
-    public String getPluginName() {
-        return LoadImpactCore.PLUGIN_NAME;
-    }
-
     public Date getLastUpdated() {
         return lastUpdated;
     }
@@ -120,4 +116,13 @@ public class LoadTestHeader implements ProminentProjectAction {
     public String getIconFileName() {
         return null;
     }
+
+    public String getLogo() {
+        return LoadImpactCore.imagePath("loadimpact-full-logo-300x50.png");
+    }
+
+    public String getPluginName() {
+        return LoadImpactCore.getPluginName();
+    }
+    
 }

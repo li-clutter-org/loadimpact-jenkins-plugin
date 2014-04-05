@@ -82,26 +82,6 @@ public class Util {
     }
 
     /**
-     * Returns the maximum value of a list of integers.
-     * @param values    list of ints
-     * @return the max value in the list
-     */
-    @Deprecated
-    public static int max(List<Integer> values) {
-        return Collections.max(values);
-    }
-
-    /**
-     * Returns the minimum value of a list of integers.
-     * @param values    list of ints
-     * @return the min value in the list
-     */
-    @Deprecated
-    public static int min(List<Integer> values) {
-        return Collections.min(values);
-    }
-
-    /**
      * Returns the last element of a list, or null if empty.
      * @param lst   the list
      * @param <T>   element type

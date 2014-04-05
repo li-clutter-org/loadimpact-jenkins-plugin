@@ -23,6 +23,7 @@ import java.util.logging.Logger;
  * @author jens
  * @date 2013-10-19, 09:30
  */
+@SuppressWarnings("UnusedDeclaration")
 public class LoadImpactTestRunPostTask extends Recorder {
     private LoadImpactCore _core;
     private transient Logger _log;

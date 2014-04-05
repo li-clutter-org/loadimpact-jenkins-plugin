@@ -80,7 +80,7 @@ public class TestResultAction implements Action {
         this.id           = String.valueOf(test.id);
         this.name         = test.name;
         this.targetUrl    = test.targetUrl;
-        this.resultUrl    = test.resultUrl + "/embed";
+        this.resultUrl    = test.resultUrl;
         this.elapsedTime  = timeFmt().print(new Period(test.started.getTime(), test.ended.getTime()));
         this.responseTime = timeFmt().print(new Period((long)Util.average(Util.collectDecimals(results.get(user_load_time)))));
         this.clientCount  = Collections.max(Util.collectInts(results.get(clients_active)));
@@ -136,7 +136,7 @@ public class TestResultAction implements Action {
     }
 
     public String getResultUrl() {
-        return resultUrl;
+        return resultUrl + "/embed";
     }
 
     public boolean getHasResult() {
@@ -154,6 +154,7 @@ public class TestResultAction implements Action {
     public int getRequestCount() {
         return requestCount;
     }
+    
     public int getRequestCountMax() {
         return requestCountMax;
     }
@@ -171,7 +172,16 @@ public class TestResultAction implements Action {
     }
 
     public String getIconFileName() {
-        return LoadImpactTestRunTask.imgUrl("loadimpact-logo-24x24.png");
+        return LoadImpactCore.imagePath("loadimpact-logo-24x24.png");
     }
+
+    public String getLogo() {
+        return LoadImpactCore.imagePath("loadimpact-full-logo-300x50.png");
+    }
+
+    public String getStyle() {
+        return LoadImpactCore.cssPath("style.css");
+    }
+    
 
 }

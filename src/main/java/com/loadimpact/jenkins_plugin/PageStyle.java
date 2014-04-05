@@ -19,8 +19,12 @@ public class PageStyle extends PageDecorator {
         return true;
     }
 
-    public String getPluginName() {
-        return LoadImpactCore.PLUGIN_NAME;
+//    public String getPluginName() {
+//        return LoadImpactCore.PLUGIN_NAME;
+//    }
+
+    public String getStyle() {
+        return LoadImpactCore.cssPath("style.css");
     }
     
 }

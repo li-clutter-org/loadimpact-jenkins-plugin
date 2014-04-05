@@ -1,17 +1,18 @@
 package com.loadimpact.jenkins_plugin;
 
-import com.loadimpact.jenkins_plugin.client.*;
-import hudson.*;
-import hudson.model.*;
+import hudson.Extension;
+import hudson.Launcher;
+import hudson.model.AbstractBuild;
+import hudson.model.AbstractProject;
+import hudson.model.Action;
+import hudson.model.BuildListener;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Builder;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
-import net.sf.json.JSONObject;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
-import org.kohsuke.stapler.StaplerRequest;
 
 import java.io.IOException;
 import java.util.List;
@@ -64,9 +65,10 @@ public class LoadImpactTestRunTask extends Builder {
         return _log;
     }
 
-    public static String imgUrl(final String imgName) {
-        return LoadImpactCore.imgUrl(imgName);
-    }
+//    @Deprecated
+//    public static String imgUrl(final String imgName) {
+//        return LoadImpactCore.imgUrl(imgName);
+//    }
 
     @Override
     public String toString() {
