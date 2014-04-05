@@ -1,15 +1,18 @@
 package com.loadimpact.jenkins_plugin.client;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 /**
- * DESCRIPTION
+ * Unit test of class Util
  *
  * @author jens
  * @date 2013-09-11, 14:45
@@ -36,7 +39,6 @@ public class UtilTest {
         return c.getTime();
     }
 
-
     @Test
     public void testSelectValueInt() {
         List<TestResult> values = Arrays.asList(
@@ -57,18 +59,6 @@ public class UtilTest {
                 new TestResult(null, null, 0, 4.5)
         );
         assertThat(Util.collectDecimals(values), is(Arrays.asList(1.5, 2.5, 3.5, 4.5)));
-    }
-
-    @Test @Ignore
-    public void testMax() {
-        List<Integer> target = Arrays.asList(1, 2, -10, 10, 5);
-        assertThat(Collections.max(target), is(10));
-    }
-
-    @Test @Ignore
-    public void testMin() {
-        List<Integer> target = Arrays.asList(1, 2, -10, 10, 5);
-        assertThat(Collections.min(target), is(-10));
     }
 
     @Test

@@ -1,16 +1,16 @@
 package com.loadimpact.jenkins_plugin;
 
-import com.loadimpact.jenkins_plugin.BoundedDroppingQueue;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 
 /**
- * DESCRIPTION
+ * Unit test of class BoundedDroppingQueue&lt;T&gt;
  *
  * @author jens
  * @date 2013-10-06, 09:13
