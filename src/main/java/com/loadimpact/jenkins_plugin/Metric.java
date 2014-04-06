@@ -8,6 +8,7 @@ import com.loadimpact.jenkins_plugin.client.ResultsCategory;
  * @author jens
  * @date 2013-10-20, 22:25
  */
+@Deprecated
 public enum Metric {
     time("User load time", "ms", ResultsCategory.user_load_time),
     count("Requests per second", "*/s", ResultsCategory.requests_per_second),

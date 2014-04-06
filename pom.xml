@@ -1,11 +1,25 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
+    
     <parent>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
         <version>1.535</version>
     </parent>
+    
+    <profiles>
+        <profile>
+            <id>jenkins</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <!-- 
+            You need to define the jenkins profile in ~/.m2/settings.xml
+            See the README.md for further details.
+            -->
+        </profile>
+    </profiles>
 
     <name>LoadImpact Jenkins plugin</name>
     <groupId>com.loadimpact</groupId>
@@ -29,6 +43,7 @@
 
     <properties>
         <maven-hpi-plugin.version>1.96</maven-hpi-plugin.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <dependencies>

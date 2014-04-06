@@ -18,6 +18,7 @@ import java.util.logging.Logger;
  * @author jens
  * @date 2013-10-13, 13:25
  */
+@Deprecated
 public class RunningTestListenerImpl implements RunningTestListener {
     private final LoadImpactCore  job;
     private final AbstractBuild   build;
@@ -35,7 +36,7 @@ public class RunningTestListenerImpl implements RunningTestListener {
         this.build = build;
         this.console = listener.getLogger();
         this.evaluators = new ArrayList<Evaluator>();
-        for (Threshold t : job.getThresholds()) {
+        for (ThresholdView t : job.getThresholds()) {
             this.evaluators.add(new Evaluator(t, job.getCriteriaDelayQueueSize()));
         }
     }
@@ -108,12 +109,12 @@ public class RunningTestListenerImpl implements RunningTestListener {
         }
 
         if (runEvaluators) {
-            List<Threshold> thresholds = job.getThresholds();
-            ResultsCategory[] categories = Util.map(thresholds, new Util.MapClosure<Threshold, ResultsCategory>() {
-                public ResultsCategory eval(Threshold t) {
+            List<ThresholdView> thresholdViews = job.getThresholds();
+            ResultsCategory[] categories = Util.map(thresholdViews, new Util.MapClosure<ThresholdView, ResultsCategory>() {
+                public ResultsCategory eval(ThresholdView t) {
                     return t.metric.category;
                 }
-            }).toArray(new ResultsCategory[thresholds.size()]);
+            }).toArray(new ResultsCategory[thresholdViews.size()]);
 
             Map<ResultsCategory, List<TestResult>> resultsPerCategory = client.getTestResults(t.id, categories);
             if (job.isLogJson()) job.log().info("Partial Results: " + resultsPerCategory);

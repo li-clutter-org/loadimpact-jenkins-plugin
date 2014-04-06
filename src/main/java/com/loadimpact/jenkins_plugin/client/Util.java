@@ -10,6 +10,7 @@ import java.util.*;
  * @author jens
  * @date 2013-09-11, 09:25
  */
+@Deprecated
 public class Util {
 
     /**

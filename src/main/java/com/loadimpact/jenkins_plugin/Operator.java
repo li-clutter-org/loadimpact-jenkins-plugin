@@ -6,6 +6,7 @@ package com.loadimpact.jenkins_plugin;
  * @author jens
  * @date 2013-10-20, 21:44
  */
+@Deprecated
 public enum Operator {
     greaterThan(">"), lessThan("<");
     

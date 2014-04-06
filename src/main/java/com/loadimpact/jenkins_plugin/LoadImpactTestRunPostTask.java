@@ -30,8 +30,8 @@ public class LoadImpactTestRunPostTask extends Recorder {
 
 
     @DataBoundConstructor
-    public LoadImpactTestRunPostTask(String apiTokenId, int loadTestId, int criteriaDelayValue, String criteriaDelayUnit, int criteriaDelayQueueSize, boolean abortAtFailure, Threshold[] thresholds, int pollInterval, boolean logHttp, boolean logJson) {
-        this._core = new LoadImpactCore(apiTokenId, loadTestId, criteriaDelayValue, criteriaDelayUnit, criteriaDelayQueueSize, abortAtFailure, thresholds, pollInterval, logHttp, logJson);
+    public LoadImpactTestRunPostTask(String apiTokenId, int loadTestId, int criteriaDelayValue, String criteriaDelayUnit, int criteriaDelayQueueSize, boolean abortAtFailure, ThresholdView[] thresholdViews, int pollInterval, boolean logHttp, boolean logJson) {
+        this._core = new LoadImpactCore(apiTokenId, loadTestId, criteriaDelayValue, criteriaDelayUnit, criteriaDelayQueueSize, abortAtFailure, thresholdViews, pollInterval, logHttp, logJson);
         log().info("properties: " + core().toString());
     }
 
@@ -87,7 +87,7 @@ public class LoadImpactTestRunPostTask extends Recorder {
         return core().isAbortAtFailure();
     }
 
-    public List<Threshold> getThresholds() {
+    public List<ThresholdView> getThresholds() {
         return core().getThresholds();
     }
 

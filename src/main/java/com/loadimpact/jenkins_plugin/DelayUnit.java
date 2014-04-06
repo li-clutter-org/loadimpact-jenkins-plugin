@@ -11,6 +11,7 @@ import java.util.List;
  * @author jens
  * @date 2013-10-21, 23:24
  */
+@Deprecated
 public enum DelayUnit {
     seconds, users;
 

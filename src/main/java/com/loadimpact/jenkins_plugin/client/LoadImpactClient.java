@@ -24,6 +24,7 @@ import java.util.logging.Logger;
  * @author jens
  * @date 2013-09-08, 17:39
  */
+@Deprecated
 public class LoadImpactClient {
     private static final String     baseUri = "https://api.loadimpact.com/v2";
     private final String            apiKey;

@@ -11,6 +11,7 @@ import java.util.List;
  * @date 2013-10-05, 18:09
  */
 @SuppressWarnings("unchecked")
+@Deprecated
 public class BoundedDroppingQueue<ElementType> implements Iterable<ElementType> {
     private final Object[] elements;
     private int putIdx = 0;

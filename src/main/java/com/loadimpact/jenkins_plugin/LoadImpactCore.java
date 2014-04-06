@@ -82,7 +82,7 @@ public class LoadImpactCore {
     /**
      * Collection of thresholds used to evaluate as failure criteria.
      */
-    private Threshold[] thresholds;
+    private ThresholdView[] thresholdViews;
 
     /**
      * Interval (in seconds) of how often to poll for server status and criterion-data.
@@ -110,14 +110,14 @@ public class LoadImpactCore {
     private transient LoadTestHeader loadTestHeader;
 
 
-    public LoadImpactCore(String apiTokenId, int loadTestId, int criteriaDelayValue, String criteriaDelayUnit, int criteriaDelayQueueSize, boolean abortAtFailure, Threshold[] thresholds, int pollInterval, boolean logHttp, boolean logJson) {
+    public LoadImpactCore(String apiTokenId, int loadTestId, int criteriaDelayValue, String criteriaDelayUnit, int criteriaDelayQueueSize, boolean abortAtFailure, ThresholdView[] thresholdViews, int pollInterval, boolean logHttp, boolean logJson) {
         this.apiTokenId = apiTokenId;
         this.loadTestId = loadTestId;
         this.criteriaDelayValue = criteriaDelayValue;
         this.criteriaDelayUnit = DelayUnit.valueOf(criteriaDelayUnit);
         this.criteriaDelayQueueSize = criteriaDelayQueueSize;
         this.abortAtFailure = abortAtFailure;
-        this.thresholds = thresholds;
+        this.thresholdViews = thresholdViews;
         this.pollInterval = pollInterval;
         this.logHttp = logHttp;
         this.logJson = logJson;
@@ -130,7 +130,7 @@ public class LoadImpactCore {
         this.criteriaDelayUnit = DelayUnit.seconds;
         this.criteriaDelayQueueSize = 1;
         this.abortAtFailure = false;
-        this.thresholds = new Threshold[0];
+        this.thresholdViews = new ThresholdView[0];
         this.pollInterval = 5;
         this.logHttp = false;
         this.logJson = false;
@@ -138,7 +138,7 @@ public class LoadImpactCore {
 
     @SuppressWarnings("UnusedDeclaration")
     private void dumpCredentials() {
-        List<ApiTokenCredentials> tokens = CredentialsProvider.lookupCredentials(ApiTokenCredentials.class, (Item) null, null, (DomainRequirement)null);
+        List<ApiTokenCredentials> tokens = CredentialsProvider.lookupCredentials(ApiTokenCredentials.class, (Item) null, null, (DomainRequirement) null);
         log().info("--- API Token Credentials ---");
         for (ApiTokenCredentials t : tokens) {
             log().info(t.toString());
@@ -303,7 +303,7 @@ public class LoadImpactCore {
         return "LoadImpact{" +
                 "apiTokenId=" + apiTokenId +
                 ", loadTestId=" + loadTestId +
-                ", thresholds=" + Arrays.toString(thresholds) +
+                ", thresholds=" + Arrays.toString(thresholdViews) +
                 ", criteriaDelayQueueSize=" + criteriaDelayQueueSize +
                 ", criteriaDelayValue=" + criteriaDelayValue +
                 ", criteriaDelayUnit='" + criteriaDelayUnit + '\'' +
@@ -357,11 +357,11 @@ public class LoadImpactCore {
         return abortAtFailure;
     }
 
-    public List<Threshold> getThresholds() {
-        if (thresholds == null) {
-            thresholds = new Threshold[0];
+    public List<ThresholdView> getThresholds() {
+        if (thresholdViews == null) {
+            thresholdViews = new ThresholdView[0];
         }
-        return Collections.unmodifiableList(Arrays.asList(thresholds));
+        return Collections.unmodifiableList(Arrays.asList(thresholdViews));
 
     }
 

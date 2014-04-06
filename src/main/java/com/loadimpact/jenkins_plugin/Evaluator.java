@@ -11,8 +11,9 @@ import java.util.List;
  * @author jens
  * @date 2013-10-21, 11:57
  */
+@Deprecated
 public class Evaluator {
-    private Threshold                     threshold;
+    private ThresholdView                 threshold;
     private BoundedDroppingQueue<Integer> values;
     private int                           lastOffset;
     private int                           aggregatedValue;
@@ -22,7 +23,7 @@ public class Evaluator {
      * @param threshold     the threshold
      * @param size          number of last values to bae the aggregation on
      */
-    public Evaluator(Threshold threshold, int size) {
+    public Evaluator(ThresholdView threshold, int size) {
         this.threshold = threshold;
         this.values = new BoundedDroppingQueue<Integer>(size);
         this.lastOffset = -1;
@@ -80,7 +81,7 @@ public class Evaluator {
         return false;
     }
 
-    public Threshold getThreshold() {
+    public ThresholdView getThreshold() {
         return threshold;
     }
 

@@ -10,6 +10,7 @@ import java.util.List;
 * @author jens
 * @date 2013-09-11, 09:24
 */
+@Deprecated
 public interface RunningTestListener {
     /**
      * Called once before the test starts.

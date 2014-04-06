@@ -17,14 +17,14 @@ import java.util.logging.Logger;
  * @author jens
  * @date 2013-10-21, 08:19
  */
-public class Threshold extends AbstractDescribableImpl<Threshold> {
+public class ThresholdView extends AbstractDescribableImpl<ThresholdView> {
     public final Metric   metric;
     public final Operator operator;
     public final Integer  value;
     public final Result   result;
 
     @DataBoundConstructor
-    public Threshold(String metric, String operator, Integer value, String result) {
+    public ThresholdView(String metric, String operator, Integer value, String result) {
         this.metric = Metric.valueOf(metric != null ? metric : Metric.time.name());
         this.operator = Operator.valueOf(operator != null ? operator : Operator.lessThan.name());
         this.value = value != null ? value : 0;
@@ -46,7 +46,7 @@ public class Threshold extends AbstractDescribableImpl<Threshold> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Threshold threshold = (Threshold) o;
+        ThresholdView threshold = (ThresholdView) o;
 
         if (!metric.equals(threshold.metric)) return false;
         if (operator != threshold.operator) return false;
@@ -66,7 +66,7 @@ public class Threshold extends AbstractDescribableImpl<Threshold> {
     }
 
     @Extension
-    public static class DescriptorImpl extends Descriptor<Threshold> {
+    public static class DescriptorImpl extends Descriptor<ThresholdView> {
         private final Logger log;
 
         public DescriptorImpl() {
