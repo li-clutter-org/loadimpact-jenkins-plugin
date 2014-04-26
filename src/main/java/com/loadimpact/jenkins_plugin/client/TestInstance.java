@@ -1,5 +1,7 @@
 package com.loadimpact.jenkins_plugin.client;
 
+import com.loadimpact.util.DateUtils;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -21,8 +23,8 @@ public class TestInstance implements Serializable {
         this.name = name;
         this.targetUrl = targetUrl;
         this.resultUrl = resultUrl;
-        this.started = Util.toDateFromIso8601(started);
-        this.ended = Util.toDateFromIso8601(ended);
+        this.started = DateUtils.toDateFromIso8601(started);
+        this.ended = DateUtils.toDateFromIso8601(ended);
         this.status = Status.valueOf(status);
         this.error = null;
     }

@@ -7,7 +7,7 @@ import hudson.model.Result;
 import hudson.util.ListBoxModel;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
-
+import com.loadimpact.eval.Operator;
 import java.util.Arrays;
 import java.util.logging.Logger;
 

@@ -1,11 +1,13 @@
 package com.loadimpact.jenkins_plugin;
 
 import com.loadimpact.jenkins_plugin.client.*;
+import com.loadimpact.util.ListUtils;
+import com.loadimpact.util.StringUtils;
 import hudson.AbortException;
 import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
 import hudson.model.Result;
-
+import com.loadimpact.eval.DelayUnit;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -66,7 +68,7 @@ public class RunningTestListenerImpl implements RunningTestListener {
                 runningStartTime = now();
             }
 
-            if (resultsUrl == null && Util.startsWith(t.resultUrl, "http")) {
+            if (resultsUrl == null && StringUtils.startsWith(t.resultUrl, "http")) {
                 resultsUrl = t.resultUrl;
                 console.printf("Starting load test [%d] %s%n", t.id, t.name);
                 console.printf("Follow the progress at %s%n", t.resultUrl);
@@ -76,12 +78,12 @@ public class RunningTestListenerImpl implements RunningTestListener {
         List<TestResult> progress = client.getTestResultsSingle(t.id, ResultsCategory.progress_percent_total);
         if (job.isLogJson()) job.log().info("Progress: " + progress);
         if (!progress.isEmpty()) {
-            double percentage = Util.last(progress).value.doubleValue();
+            double percentage = ListUtils.last(progress).value.doubleValue();
             if (lastPercentage == null || lastPercentage != percentage) {
                 lastPercentage = percentage;
                 int totalMinutes = job.getLoadTestHeader().getDurationInMinutes();
                 console.printf("Running: %s (~ %.1f minutes remaining)%n",
-                        Util.percentageBar(percentage), totalMinutes * (100D - percentage) / 100D);
+                        StringUtils.percentageBar(percentage), totalMinutes * (100D - percentage) / 100D);
             } else if (!finishing && percentage >= 100D) {
                 finishing = true;
                 console.printf("Status: %s%n", "finishing");
@@ -91,7 +93,7 @@ public class RunningTestListenerImpl implements RunningTestListener {
         if (!runEvaluators && status.isRunning() && !finishing) {
             if (job.getCriteriaDelayUnit().equals(DelayUnit.users)) {
                 List<TestResult> c = client.getTestResultsSingle(t.id, ResultsCategory.clients_active);
-                int usersActive = c.isEmpty() ? 0 : Util.last(c).value.intValue();
+                int usersActive = c.isEmpty() ? 0 : ListUtils.last(c).value.intValue();
                 int usersThreshold = job.getCriteriaDelayValue();
                 runEvaluators = (usersThreshold < usersActive);
                 if (runEvaluators) {
@@ -110,7 +112,7 @@ public class RunningTestListenerImpl implements RunningTestListener {
 
         if (runEvaluators) {
             List<ThresholdView> thresholdViews = job.getThresholds();
-            ResultsCategory[] categories = Util.map(thresholdViews, new Util.MapClosure<ThresholdView, ResultsCategory>() {
+            ResultsCategory[] categories = ListUtils.map(thresholdViews, new ListUtils.MapClosure<ThresholdView, ResultsCategory>() {
                 public ResultsCategory eval(ThresholdView t) {
                     return t.metric.category;
                 }

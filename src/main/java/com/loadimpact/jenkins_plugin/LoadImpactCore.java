@@ -2,42 +2,25 @@ package com.loadimpact.jenkins_plugin;
 
 import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.domains.DomainRequirement;
-import com.loadimpact.jenkins_plugin.client.LoadImpactClient;
-import com.loadimpact.jenkins_plugin.client.ResultsCategory;
-import com.loadimpact.jenkins_plugin.client.RunningTestListener;
-import com.loadimpact.jenkins_plugin.client.TestConfiguration;
-import com.loadimpact.jenkins_plugin.client.TestInstance;
-import com.loadimpact.jenkins_plugin.client.TestResult;
-import com.loadimpact.jenkins_plugin.client.Util;
+import com.loadimpact.eval.DelayUnit;
+import com.loadimpact.jenkins_plugin.client.*;
+import com.loadimpact.util.ListUtils;
+import com.loadimpact.util.StringUtils;
 import hudson.AbortException;
 import hudson.Functions;
 import hudson.Launcher;
 import hudson.PluginWrapper;
-import hudson.model.AbstractBuild;
-import hudson.model.AbstractProject;
-import hudson.model.Action;
-import hudson.model.BuildListener;
-import hudson.model.Cause;
-import hudson.model.Item;
-import hudson.model.Result;
+import hudson.model.*;
 import jenkins.model.Jenkins;
 import org.joda.time.format.ISODateTimeFormat;
 
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static com.loadimpact.jenkins_plugin.client.ResultsCategory.bandwidth;
-import static com.loadimpact.jenkins_plugin.client.ResultsCategory.clients_active;
-import static com.loadimpact.jenkins_plugin.client.ResultsCategory.requests_per_second;
-import static com.loadimpact.jenkins_plugin.client.ResultsCategory.user_load_time;
+import static com.loadimpact.jenkins_plugin.client.ResultsCategory.*;
 
 /**
  * Common parts of this plugin, used by both the build and post-build tasks.
@@ -194,7 +177,7 @@ public class LoadImpactCore {
      */
     public Action getProjectAction(AbstractProject<?, ?> project) {
         if (loadTestHeader == null) {
-            if (Util.isBlank(getApiToken())) {
+            if (StringUtils.isBlank(getApiToken())) {
                 log().warning("No API token defined");
                 return new LoadTestHeader();
             }
@@ -204,12 +187,12 @@ public class LoadImpactCore {
                 log().info(Messages.LoadImpactCore_FetchedConfig(cfg));
 
                 String date = ISODateTimeFormat.date().print(cfg.date.getTime()) + " " + ISODateTimeFormat.timeNoMillis().print(cfg.date.getTime());
-                int duration = Util.reduce(cfg.schedules, 0, new Util.ReduceClosure<Integer, TestConfiguration.LoadSchedule>() {
+                int duration = ListUtils.reduce(cfg.schedules, 0, new ListUtils.ReduceClosure<Integer, TestConfiguration.LoadSchedule>() {
                     public Integer eval(Integer sum, TestConfiguration.LoadSchedule s) {
                         return sum + s.duration;
                     }
                 });
-                int clients = Util.reduce(cfg.schedules, 0, new Util.ReduceClosure<Integer, TestConfiguration.LoadSchedule>() {
+                int clients = ListUtils.reduce(cfg.schedules, 0, new ListUtils.ReduceClosure<Integer, TestConfiguration.LoadSchedule>() {
                     public Integer eval(Integer max, TestConfiguration.LoadSchedule s) {
                         return Math.max(max, s.users);
                     }

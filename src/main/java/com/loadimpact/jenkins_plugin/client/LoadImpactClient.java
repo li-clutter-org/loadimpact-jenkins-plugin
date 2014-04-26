@@ -1,5 +1,6 @@
 package com.loadimpact.jenkins_plugin.client;
 
+import com.loadimpact.util.ListUtils;
 import hudson.AbortException;
 import org.apache.commons.lang.StringUtils;
 import org.glassfish.jersey.client.filter.HttpBasicAuthFilter;
@@ -295,12 +296,14 @@ public class LoadImpactClient {
      * @return [cat1:result1, cat2:result2, ...]
      */
     public Map<ResultsCategory, List<TestResult>> getTestResults(int id, ResultsCategory... categories) {
-        List<String> categoryIds = Util.map(Arrays.asList(categories), new Util.MapClosure<ResultsCategory, String>() {
-            public String eval(ResultsCategory c) { return c.param; }
+        List<String> categoryIds = ListUtils.map(Arrays.asList(categories), new ListUtils.MapClosure<ResultsCategory, String>() {
+            public String eval(ResultsCategory c) {
+                return c.param;
+            }
         });
 
         JsonObject response = wsBase.path("tests").path(Integer.toString(id)).path("results")
-                                    .queryParam("ids", Util.join(categoryIds, ","))
+                                    .queryParam("ids", ListUtils.join(categoryIds, ","))
                                     .request(MediaType.APPLICATION_JSON).get(JsonObject.class);
 
         Map<ResultsCategory, List<TestResult>> results = new TreeMap<ResultsCategory, List<TestResult>>();

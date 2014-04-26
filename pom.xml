@@ -24,8 +24,20 @@
     <name>LoadImpact Jenkins plugin</name>
     <groupId>com.loadimpact</groupId>
     <artifactId>LoadImpact-Jenkins-plugin</artifactId>
-    <version>1.3.3</version>
+    <version>1.4</version>
     <packaging>hpi</packaging>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java.version>1.6</java.version>
+        <maven-hpi-plugin.version>1.96</maven-hpi-plugin.version>
+        <credentials.version>1.10</credentials.version>
+        <loadimpact.sdk.version>1.2-SNAPSHOT</loadimpact.sdk.version>
+        <jersey.version>2.4</jersey.version>
+        <joda.version>2.3</joda.version>
+        <junit.version>4.11</junit.version>
+        <mockito.version>1.9.5</mockito.version>
+    </properties>
 
     <repositories>
         <repository>
@@ -41,42 +53,60 @@
         </pluginRepository>
     </pluginRepositories>
 
-    <properties>
-        <maven-hpi-plugin.version>1.96</maven-hpi-plugin.version>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
 
     <dependencies>
         <dependency>
+            <groupId>com.loadimpact</groupId>
+            <artifactId>Load-Impact-Java-SDK</artifactId>
+            <version>${loadimpact.sdk.version}</version>
+        </dependency>
+        
+        <dependency>
             <groupId>org.jenkins-ci.plugins</groupId>
             <artifactId>credentials</artifactId>
-            <version>1.10</version>
+            <version>${credentials.version}</version>
+            <scope>provided</scope>
         </dependency>
+        
         <dependency>
             <groupId>org.glassfish.jersey.core</groupId>
             <artifactId>jersey-client</artifactId>
-            <version>2.2</version>
+            <version>${jersey.version}</version>
+            <scope>compile</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-multipart</artifactId>
+            <version>${jersey.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        
         <dependency>
             <groupId>org.glassfish.jersey.media</groupId>
             <artifactId>jersey-media-json-processing</artifactId>
-            <version>2.2</version>
+            <version>${jersey.version}</version>
+            <scope>compile</scope>
         </dependency>
+        
         <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
-            <version>2.3</version>
+            <version>${joda.version}</version>
+            <scope>compile</scope>
         </dependency>
+        
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.11</version>
+            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
+        
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>1.9.5</version>
+            <version>${mockito.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

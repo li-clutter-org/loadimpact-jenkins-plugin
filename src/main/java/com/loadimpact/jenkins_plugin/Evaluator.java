@@ -1,7 +1,9 @@
 package com.loadimpact.jenkins_plugin;
 
 import com.loadimpact.jenkins_plugin.client.TestResult;
-import com.loadimpact.jenkins_plugin.client.Util;
+import com.loadimpact.eval.Operator;
+import com.loadimpact.eval.BoundedDroppingQueue;
+import com.loadimpact.util.ListUtils;
 
 import java.util.List;
 
@@ -45,7 +47,7 @@ public class Evaluator {
             lastOffset = r.offset;
         }
 
-        aggregatedValue = Util.median(values.toList());
+        aggregatedValue = ListUtils.median(values.toList());
         return exceedsThreshold(aggregatedValue);
         
     }
@@ -57,7 +59,7 @@ public class Evaluator {
                 values.put(r.value.intValue());
                 lastOffset = r.offset;
             }
-            aggregatedValue = Util.median(values.toList());    
+            aggregatedValue = ListUtils.median(values.toList());    
         }
         return this;
     }

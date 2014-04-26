@@ -1,5 +1,7 @@
 package com.loadimpact.jenkins_plugin.client;
 
+import com.loadimpact.util.DateUtils;
+
 import javax.json.JsonNumber;
 import javax.json.JsonObject;
 import java.io.Serializable;
@@ -27,7 +29,7 @@ public class TestResult implements Serializable, Comparable<TestResult> {
     
     public TestResult(ResultsCategory category, JsonObject json) {
         this.category  = category;
-        this.timestamp = Util.toDateFromTimestamp((json.getJsonNumber("timestamp").longValue()));
+        this.timestamp = DateUtils.toDateFromTimestamp((json.getJsonNumber("timestamp").longValue()));
         this.offset    = json.getInt("offset");
         JsonNumber   n = json.getJsonNumber(category.valueName);
         this.value     = n.isIntegral() ? n.longValue() : n.doubleValue();

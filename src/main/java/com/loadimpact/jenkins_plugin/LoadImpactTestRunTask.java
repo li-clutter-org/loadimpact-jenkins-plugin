@@ -13,7 +13,7 @@ import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
-
+import com.loadimpact.eval.DelayUnit;
 import java.io.IOException;
 import java.util.List;
 import java.util.logging.Logger;

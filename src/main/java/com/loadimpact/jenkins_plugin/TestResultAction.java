@@ -3,7 +3,7 @@ package com.loadimpact.jenkins_plugin;
 import com.loadimpact.jenkins_plugin.client.ResultsCategory;
 import com.loadimpact.jenkins_plugin.client.TestInstance;
 import com.loadimpact.jenkins_plugin.client.TestResult;
-import com.loadimpact.jenkins_plugin.client.Util;
+import com.loadimpact.util.ListUtils;
 import hudson.model.AbstractBuild;
 import hudson.model.Action;
 import org.joda.time.Period;
@@ -82,15 +82,36 @@ public class TestResultAction implements Action {
         this.targetUrl    = test.targetUrl;
         this.resultUrl    = test.resultUrl;
         this.elapsedTime  = timeFmt().print(new Period(test.started.getTime(), test.ended.getTime()));
-        this.responseTime = timeFmt().print(new Period((long)Util.average(Util.collectDecimals(results.get(user_load_time)))));
-        this.clientCount  = Collections.max(Util.collectInts(results.get(clients_active)));
+//        this.responseTime = timeFmt().print(new Period((long) ListUtils.average(Util.collectDecimals(results.get(user_load_time)))));
+        this.responseTime = timeFmt().print(new Period((long) ListUtils.average(ListUtils.map(results.get(user_load_time), new ListUtils.MapClosure<TestResult, Number>() {
+            public Number eval(TestResult r) {
+                return r.value.doubleValue();
+            }
+        }))));
+        
+//        this.clientCount  = Collections.max(Util.collectInts(results.get(clients_active)));
+        this.clientCount  = Collections.max(ListUtils.map(results.get(clients_active), new ListUtils.MapClosure<TestResult, Integer>() {
+            public Integer eval(TestResult r) {
+                return r.value.intValue();
+            }
+        }));
 
-        List<Double> requestCounts = Util.collectDecimals(results.get(requests_per_second));
-        this.requestCount          = (int) Util.average(requestCounts);
+//        List<Double> requestCounts = Util.collectDecimals(results.get(requests_per_second));
+        List<Double> requestCounts = ListUtils.map(results.get(requests_per_second), new ListUtils.MapClosure<TestResult, Double>() {
+            public Double eval(TestResult r) {
+                return r.value.doubleValue();
+            }
+        });
+        this.requestCount          = (int) ListUtils.average(requestCounts);
         this.requestCountMax       = Collections.max(requestCounts).intValue();
 
-        List<Double> bandwidths    = Util.collectDecimals(results.get(ResultsCategory.bandwidth));
-        this.bandwidth             = Util.average(bandwidths) / 1E6;
+//        List<Double> bandwidths    = Util.collectDecimals(results.get(ResultsCategory.bandwidth));
+        List<Double> bandwidths    = ListUtils.map(results.get(ResultsCategory.bandwidth), new ListUtils.MapClosure<TestResult, Double>() {
+            public Double eval(TestResult r) {
+                return r.value.doubleValue();
+            }
+        });
+        this.bandwidth             = ListUtils.average(bandwidths) / 1E6;
         this.bandwidthMax          = Collections.max(bandwidths) / 1E6;
     }
 

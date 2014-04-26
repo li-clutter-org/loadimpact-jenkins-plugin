@@ -1,6 +1,6 @@
 package com.loadimpact.jenkins_plugin;
 
-import com.loadimpact.jenkins_plugin.client.Util;
+import com.loadimpact.util.StringUtils;
 import hudson.model.ProminentProjectAction;
 import org.joda.time.format.ISODateTimeFormat;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -53,7 +53,7 @@ public class LoadTestHeader implements ProminentProjectAction {
     }
 
     public boolean isUndefinedApiToken() {
-        return Util.isBlank(id);
+        return StringUtils.isBlank(id);
     }
 
     public String getId() {

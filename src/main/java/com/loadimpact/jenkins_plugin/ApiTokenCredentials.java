@@ -1,11 +1,9 @@
 package com.loadimpact.jenkins_plugin;
 
 import com.cloudbees.plugins.credentials.*;
-import com.cloudbees.plugins.credentials.common.PasswordCredentials;
-import com.cloudbees.plugins.credentials.common.StandardUsernameCredentials;
 import com.cloudbees.plugins.credentials.impl.BaseStandardCredentials;
-import com.loadimpact.jenkins_plugin.client.LoadImpactClient;
-import com.loadimpact.jenkins_plugin.client.Util;
+import com.loadimpact.ApiTokenClient;
+import com.loadimpact.util.StringUtils;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
@@ -45,6 +43,7 @@ public class ApiTokenCredentials extends BaseStandardCredentials implements Cred
                 +"}";
     }
 
+    @SuppressWarnings("UnusedDeclaration")
     @Extension
     public static class DescriptorImpl extends CredentialsDescriptor {
         @Override
@@ -53,7 +52,7 @@ public class ApiTokenCredentials extends BaseStandardCredentials implements Cred
         }
 
         public FormValidation doCheckApiToken(@QueryParameter String value) {
-            if (Util.isBlank(value)) {
+            if (StringUtils.isBlank(value)) {
                 return FormValidation.error(Messages.ApiTokenCredentials_CannotBeBlank());
             }
             if (value.length() != 64) {
@@ -67,9 +66,11 @@ public class ApiTokenCredentials extends BaseStandardCredentials implements Cred
     
         public FormValidation doValidateApiToken(@QueryParameter("apiToken") final String apiToken) {
             try {
-                LoadImpactClient client = new LoadImpactClient(apiToken);
-                return client.isValidKey() ? FormValidation.ok(Messages.ApiTokenCredentials_TokenOK()) 
-                                           : FormValidation.error(Messages.ApiTokenCredentials_TokenNotOK());
+                ApiTokenClient apiTokenClient = new ApiTokenClient(apiToken);
+                if (apiTokenClient.isValidToken()) {
+                    return FormValidation.ok(Messages.ApiTokenCredentials_TokenOK());
+                }
+                return FormValidation.error(Messages.ApiTokenCredentials_TokenNotOK());
             } catch (Exception e) {
                 return FormValidation.error(Messages.ApiTokenCredentials_FailedWhenValidating(e));
             }
@@ -80,8 +81,9 @@ public class ApiTokenCredentials extends BaseStandardCredentials implements Cred
         @NonNull
         @Override
         public String getName(@NonNull ApiTokenCredentials c) {
-            String description = Util.fixEmpty(c.getDescription());
-            return description != null ? description : Messages.ApiTokenCredentials_ShortName();
+            String description = c.getDescription();
+            if (!StringUtils.isBlank(description)) return description;
+            return Messages.ApiTokenCredentials_ShortName();
         }
     }
     

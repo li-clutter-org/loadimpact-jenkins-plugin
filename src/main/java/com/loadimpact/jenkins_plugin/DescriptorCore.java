@@ -3,7 +3,8 @@ package com.loadimpact.jenkins_plugin;
 import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.domains.DomainRequirement;
 import com.loadimpact.jenkins_plugin.client.LoadImpactClient;
-import com.loadimpact.jenkins_plugin.client.Util;
+import com.loadimpact.eval.DelayUnit;
+import com.loadimpact.util.StringUtils;
 import hudson.model.Item;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
@@ -52,7 +53,7 @@ public class DescriptorCore {
         ListBoxModel items = new ListBoxModel();
         for (ApiTokenCredentials t : getAllTokenCredentials()) {
             String label = t.getDescription();
-            if (Util.isBlank(label)) {
+            if (StringUtils.isBlank(label)) {
                 String txt = t.getApiToken().getPlainText();
                 label = "API Token " + txt.substring(0, 12) + "..." + txt.substring(txt.length() - 4);
             }
@@ -67,13 +68,13 @@ public class DescriptorCore {
         if (getAllTokenCredentials().isEmpty()) {
             return FormValidation.error(Messages.DescriptorCore_MissingToken());
         }
-        if (Util.isBlank(value)) {
+        if (StringUtils.isBlank(value)) {
             return FormValidation.ok();
         }
 
         ApiTokenCredentials c = getTokenCredentials(value);
         String token = c.getApiToken().getPlainText();
-        if (Util.isBlank(token)) {
+        if (StringUtils.isBlank(token)) {
             return FormValidation.error(Messages.DescriptorCore_BlankToken());
         }
         if (token.length() != 64) {
@@ -114,7 +115,7 @@ public class DescriptorCore {
 
     public FormValidation doCheckLoadTestId(@QueryParameter String value) {
         log.info("CHECK loadTest=" + value);
-        if (Util.isBlank(value)) {
+        if (StringUtils.isBlank(value)) {
             return FormValidation.error(Messages.DescriptorCore_BlankLoadTestId());
         }
         return checkForPositiveNumber(value);
