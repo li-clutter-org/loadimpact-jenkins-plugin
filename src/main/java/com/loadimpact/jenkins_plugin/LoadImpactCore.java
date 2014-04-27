@@ -2,25 +2,40 @@ package com.loadimpact.jenkins_plugin;
 
 import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.domains.DomainRequirement;
+import com.loadimpact.ApiTokenClient;
 import com.loadimpact.eval.DelayUnit;
-import com.loadimpact.jenkins_plugin.client.*;
+import com.loadimpact.eval.LoadTestListener;
+import com.loadimpact.jenkins_plugin.loadtest.JenkinsLoadTestLogger;
+import com.loadimpact.jenkins_plugin.loadtest.JenkinsLoadTestParameters;
+import com.loadimpact.jenkins_plugin.loadtest.JenkinsLoadTestResultListener;
+import com.loadimpact.resource.Test;
+import com.loadimpact.resource.TestConfiguration;
+import com.loadimpact.resource.configuration.LoadClip;
+import com.loadimpact.resource.configuration.LoadScheduleStep;
+import com.loadimpact.resource.configuration.LoadTrack;
+import com.loadimpact.resource.testresult.StandardMetricResult;
 import com.loadimpact.util.ListUtils;
 import com.loadimpact.util.StringUtils;
-import hudson.AbortException;
 import hudson.Functions;
 import hudson.Launcher;
 import hudson.PluginWrapper;
 import hudson.model.*;
 import jenkins.model.Jenkins;
-import org.joda.time.format.ISODateTimeFormat;
+import org.joda.time.Period;
+import org.joda.time.format.PeriodFormatter;
+import org.joda.time.format.PeriodFormatterBuilder;
 
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.*;
-import java.util.logging.Level;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 import java.util.logging.Logger;
 
-import static com.loadimpact.jenkins_plugin.client.ResultsCategory.*;
+import static com.loadimpact.resource.testresult.StandardMetricResult.Metrics.*;
+
+//import com.loadimpact.jenkins_plugin.client.TestConfiguration;
 
 /**
  * Common parts of this plugin, used by both the build and post-build tasks.
@@ -29,8 +44,8 @@ import static com.loadimpact.jenkins_plugin.client.ResultsCategory.*;
  * @date 2013-10-21, 09:06
  */
 public class LoadImpactCore {
-    @Deprecated
-    private static final String PLUGIN_NAME = "LoadImpact-Jenkins-plugin";
+//    @Deprecated
+//    private static final String PLUGIN_NAME = "LoadImpact-Jenkins-plugin";
 
     /**
      * API token (credentials) ID.
@@ -138,36 +153,138 @@ public class LoadImpactCore {
      * @throws InterruptedException     if a waiting thread was interrupted
      * @throws IOException  if some I/O went wrong
      */
+    @SuppressWarnings("UnusedParameters")
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
         final PrintStream console = listener.getLogger();
         listener.started(Arrays.asList((Cause) new Cause.UserCause()));
 
-        LoadImpactClient client = getLoadImpactClient();
-        try {
-            RunningTestListener progressMonitor = new RunningTestListenerImpl(this, build, listener);
-            TestInstance testInstance = client.runTest(getLoadTestId(), pollInterval, progressMonitor);
+//        LoadImpactClient client = getLoadImpactClient();
+        ApiTokenClient                  client           = getApiTokenClient();
+        JenkinsLoadTestParameters       parameters       = new JenkinsLoadTestParameters(this);
+        JenkinsLoadTestLogger           logger           = new JenkinsLoadTestLogger(console);
+        JenkinsLoadTestResultListener   resultListener   = new JenkinsLoadTestResultListener();
+        LoadTestListener                loadTestListener = new LoadTestListener(parameters, logger, resultListener);
 
-            console.printf(Messages.LoadImpactCore_FetchingResult());
-            Map<ResultsCategory, List<TestResult>> testResults = client.getTestResults(testInstance.id, user_load_time, requests_per_second, bandwidth, clients_active);
-            TestResultAction testResultAction = new TestResultAction(build, testInstance, testResults);
+        TestConfiguration testConfiguration = client.getTestConfiguration(parameters.getTestConfigurationId());
+        loadTestListener.onSetup(testConfiguration, client);
+
+        logger.message("Launching the load test");
+        int     testId = client.startTest(testConfiguration.id);
+        Test    test   = client.monitorTest(testId,  parameters.getPollInterval(), loadTestListener);
+        
+        if (test != null && !resultListener.isNonSuccessful()) {
+            logger.message(Messages.LoadImpactCore_FetchingResult());
+            TestResultAction testResultAction = populateTestResults(test, client, build);
             build.addAction(testResultAction);
+            if (build.getResult() == null) build.setResult(Result.SUCCESS);
 
-            if (build.getResult() == null) {
-                build.setResult(Result.SUCCESS);
-            }
             return true;
-        } catch (AbortException e) {
-            listener.error(Messages.LoadImpactCore_Aborted(e.getMessage()));
-            build.setResult(Result.ABORTED);
-        } catch (Exception e) {
-            log().log(Level.WARNING, String.format("Failed to execute HTTP REST call: %s", e), e);
-            log().log(Level.WARNING, "Exception", e);
-
-            listener.error(Messages.LoadImpactCore_Failed(e));
+        } else {
+            listener.error(Messages.LoadImpactCore_Failed(""));
             build.setResult(Result.FAILURE);
         }
 
+//        try {
+//            RunningTestListener progressMonitor = new RunningTestListenerImpl(this, build, listener);
+//            TestInstance testInstance = client.runTest(getLoadTestId(), pollInterval, progressMonitor);
+
+//            console.printf(Messages.LoadImpactCore_FetchingResult());
+//            Map<ResultsCategory, List<TestResult>> testResults = client.getTestResults(testInstance.id, user_load_time, requests_per_second, bandwidth, clients_active);
+//            TestResultAction testResultAction = new TestResultAction(build, testInstance, testResults);
+//            build.addAction(testResultAction);
+
+//            if (build.getResult() == null) {
+//                build.setResult(Result.SUCCESS);
+//            }
+//            return true;
+//        } catch (AbortException e) {
+//            listener.error(Messages.LoadImpactCore_Aborted(e.getMessage()));
+//            build.setResult(Result.ABORTED);
+//        } catch (Exception e) {
+//            log().log(Level.WARNING, String.format("Failed to execute HTTP REST call: %s", e), e);
+//            log().log(Level.WARNING, "Exception", e);
+//
+//            listener.error(Messages.LoadImpactCore_Failed(e));
+//            build.setResult(Result.FAILURE);
+//        }
+
         return false;
+    }
+
+    TestResultAction populateTestResults(Test tst, ApiTokenClient client, AbstractBuild<?, ?> build) {
+        String      name              = tst.title;
+        String      testId            = String.valueOf(tst.id);
+        String      targetUrl         = tst.url.toString();
+        String      resultUrl         = tst.publicUrl.toString();
+        String      elapsedTime       = computeElapsedTime(tst);
+        String      responseTime      = computeResponseTime(tst, client);
+        int         clientCount       = computeClientsCount(tst, client);
+        int[]       reqCnt            = computeRequestsCount(tst, client);
+        int         requestCount      = reqCnt[0];
+        int         requestCountMax   = reqCnt[1];
+        double[]    bw                = computeBandwidth(tst, client);
+        double      bandwidthValue    = bw[0];
+        double      bandwidthValueMax = bw[1];
+        
+        return new TestResultAction(build, name, testId, targetUrl, resultUrl, elapsedTime, responseTime, requestCount, requestCountMax, bandwidthValue, bandwidthValueMax, clientCount);
+    }
+    
+
+    String computeElapsedTime(Test tst) {
+        return timeFmt().print(new Period(tst.started.getTime(), tst.ended.getTime()));
+    }
+
+    @SuppressWarnings("unchecked")
+    String computeResponseTime(Test tst, ApiTokenClient client) {
+        List<StandardMetricResult> results = (List<StandardMetricResult>) client.getStandardMetricResults(tst.id, USER_LOAD_TIME, null, null);
+        List<Double> values = ListUtils.map(results, new ListUtils.MapClosure<StandardMetricResult, Double>() {
+            public Double eval(StandardMetricResult r) { return r.value.doubleValue(); }
+        });
+        return timeFmt().print(new Period((long) ListUtils.average(values)));
+    }
+
+    @SuppressWarnings("unchecked")
+    Integer computeClientsCount(Test tst, ApiTokenClient client) {
+        List<StandardMetricResult> results = (List<StandardMetricResult>) client.getStandardMetricResults(tst.id, CLIENTS_ACTIVE, null, null);
+        List<Integer> values = ListUtils.map(results, new ListUtils.MapClosure<StandardMetricResult, Integer>() {
+            public Integer eval(StandardMetricResult r) { return r.value.intValue(); }
+        });
+        return Collections.max(values);
+    }
+
+    @SuppressWarnings("unchecked")
+    int[] computeRequestsCount(Test tst, ApiTokenClient client) {
+        List<StandardMetricResult> results = (List<StandardMetricResult>) client.getStandardMetricResults(tst.id, REQUESTS_PER_SECOND, null, null);
+        List<Double> values = ListUtils.map(results, new ListUtils.MapClosure<StandardMetricResult, Double>() {
+            public Double eval(StandardMetricResult r) { return r.value.doubleValue(); }
+        });
+        int avg = (int) ListUtils.average(values);
+        int max = Collections.max(values).intValue();
+        return new int[]{avg, max};
+    }
+
+    @SuppressWarnings("unchecked")
+    double[] computeBandwidth(Test tst, ApiTokenClient client) {
+        List<StandardMetricResult> results = (List<StandardMetricResult>) client.getStandardMetricResults(tst.id, BANDWIDTH, null, null);
+        List<Double> values = ListUtils.map(results, new ListUtils.MapClosure<StandardMetricResult, Double>() {
+            public Double eval(StandardMetricResult r) { return r.value.doubleValue(); }
+        });
+        double avg = ListUtils.average(values) / 1E6;
+        double max = Collections.max(values).intValue() / 1E6;
+        return new double[]{avg, max};
+    }
+
+    PeriodFormatter timeFmt() {
+        return new PeriodFormatterBuilder()
+                .minimumPrintedDigits(0)
+                .printZeroNever()
+                .appendHours()
+                .appendSeparator("h ")
+                .appendMinutes()
+                .appendSeparator("m ")
+                .appendSeconds()
+                .appendSuffix("s")
+                .toFormatter();
     }
 
     /**
@@ -175,6 +292,7 @@ public class LoadImpactCore {
      * @param project  jenkins project
      * @return jenkins action
      */
+    @SuppressWarnings("UnusedParameters")
     public Action getProjectAction(AbstractProject<?, ?> project) {
         if (loadTestHeader == null) {
             if (StringUtils.isBlank(getApiToken())) {
@@ -183,26 +301,38 @@ public class LoadImpactCore {
             }
 
             try {
-                TestConfiguration cfg = getLoadImpactClient().getTestConfiguration(getLoadTestId());
-                log().info(Messages.LoadImpactCore_FetchedConfig(cfg));
+//                TestConfiguration cfg = getLoadImpactClient().getTestConfiguration(getLoadTestId());
+                TestConfiguration tstCfg = getApiTokenClient().getTestConfiguration(getLoadTestId());
+                log().info(Messages.LoadImpactCore_FetchedConfig(tstCfg));
 
-                String date = ISODateTimeFormat.date().print(cfg.date.getTime()) + " " + ISODateTimeFormat.timeNoMillis().print(cfg.date.getTime());
-                int duration = ListUtils.reduce(cfg.schedules, 0, new ListUtils.ReduceClosure<Integer, TestConfiguration.LoadSchedule>() {
-                    public Integer eval(Integer sum, TestConfiguration.LoadSchedule s) {
+//                String date = ISODateTimeFormat.date().print(cfg.date.getTime()) + " " + ISODateTimeFormat.timeNoMillis().print(cfg.date.getTime());
+                
+                int duration = ListUtils.reduce(tstCfg.loadSchedule, 0, new ListUtils.ReduceClosure<Integer, LoadScheduleStep>() {
+                    public Integer eval(Integer sum, LoadScheduleStep s) {
                         return sum + s.duration;
                     }
                 });
-                int clients = ListUtils.reduce(cfg.schedules, 0, new ListUtils.ReduceClosure<Integer, TestConfiguration.LoadSchedule>() {
-                    public Integer eval(Integer max, TestConfiguration.LoadSchedule s) {
+                int clients = ListUtils.reduce(tstCfg.loadSchedule, 0, new ListUtils.ReduceClosure<Integer, LoadScheduleStep>() {
+                    public Integer eval(Integer max, LoadScheduleStep s) {
                         return Math.max(max, s.users);
                     }
                 });
-                List<LoadTestHeader.Zone> zones = new ArrayList<LoadTestHeader.Zone>();
-                for (TestConfiguration.Track track : cfg.tracks) {
-                    zones.add(new LoadTestHeader.Zone(track.zone, track.percent));
-                }
+//                List<LoadTestHeader.Zone> zones = new ArrayList<LoadTestHeader.Zone>();
+//                for (TestConfiguration.Track track : cfg.tracks) {
+//                    zones.add(new LoadTestHeader.Zone(track.zone, track.percent));
+//                }
+                List<LoadTestHeader.Zone> zones = ListUtils.map(tstCfg.tracks, new ListUtils.MapClosure<LoadTrack, LoadTestHeader.Zone>() {
+                    public LoadTestHeader.Zone eval(LoadTrack t) {
+                        Integer percentage = ListUtils.reduce(t.clips, 0, new ListUtils.ReduceClosure<Integer, LoadClip>() {
+                            public Integer eval(Integer sum, LoadClip loadClip) {
+                                return sum + loadClip.percent;
+                            }
+                        });
+                        return new LoadTestHeader.Zone(t.zone, percentage);
+                    }
+                });
 
-                loadTestHeader = new LoadTestHeader(loadTestId, cfg.name, cfg.date, cfg.url, duration, clients, cfg.userType.label, zones);
+                loadTestHeader = new LoadTestHeader(loadTestId, tstCfg.name, tstCfg.updated, tstCfg.url.toString(), duration, clients, tstCfg.userType.label, zones);
             } catch (Exception e) {
                 return new LoadTestHeader(loadTestId, "Error: "+e.toString(), new Date(), "", 0, 0, "", null);
             }
@@ -218,24 +348,31 @@ public class LoadImpactCore {
         return loadTestHeader;
     }
 
+    private ApiTokenClient getApiTokenClient() {
+        ApiTokenClient client = new ApiTokenClient(getApiToken());
+        client.setDebug(isLogHttp());
+        return client;
+    }
+    
 
     /**
      * Creates a LoadImpact REST client.
      * @return a client
      */
-    private LoadImpactClient getLoadImpactClient() {
-        return new LoadImpactClient(getApiToken(), isLogHttp());
-    }
+//    @Deprecated
+//    private LoadImpactClient getLoadImpactClient() {
+//        return new LoadImpactClient(getApiToken(), isLogHttp());
+//    }
 
-    /**
-     * Helper function that returns a proper image URL.
-     * @param imgName   name of image file
-     * @return jenkins URL
-     */
-    @Deprecated
-    public static String imgUrl(final String imgName) {
-        return Functions.getResourcePath() + "/plugin/" + PLUGIN_NAME + "/img/" + imgName;
-    }
+//    /**
+//     * Helper function that returns a proper image URL.
+//     * @param imgName   name of image file
+//     * @return jenkins URL
+//     */
+//    @Deprecated
+//    public static String imgUrl(final String imgName) {
+//        return Functions.getResourcePath() + "/plugin/" + PLUGIN_NAME + "/img/" + imgName;
+//    }
 
     /**
      * Reads the proper plugin name from the MANIFEST

@@ -74,6 +74,20 @@ public class TestResultAction implements Action {
      */
     private int clientCount;
 
+    public TestResultAction(AbstractBuild<?, ?> build, String name, String id, String targetUrl, String resultUrl, String elapsedTime, String responseTime, int requestCount, int requestCountMax, double bandwidth, double bandwidthMax, int clientCount) {
+        this.build = build;
+        this.name = name;
+        this.id = id;
+        this.targetUrl = targetUrl;
+        this.resultUrl = resultUrl;
+        this.elapsedTime = elapsedTime;
+        this.responseTime = responseTime;
+        this.requestCount = requestCount;
+        this.requestCountMax = requestCountMax;
+        this.bandwidth = bandwidth;
+        this.bandwidthMax = bandwidthMax;
+        this.clientCount = clientCount;
+    }
 
     public TestResultAction(AbstractBuild<?, ?> build, TestInstance test, Map<ResultsCategory, List<TestResult>> results) {
         this.build        = build;
@@ -82,6 +96,7 @@ public class TestResultAction implements Action {
         this.targetUrl    = test.targetUrl;
         this.resultUrl    = test.resultUrl;
         this.elapsedTime  = timeFmt().print(new Period(test.started.getTime(), test.ended.getTime()));
+        
 //        this.responseTime = timeFmt().print(new Period((long) ListUtils.average(Util.collectDecimals(results.get(user_load_time)))));
         this.responseTime = timeFmt().print(new Period((long) ListUtils.average(ListUtils.map(results.get(user_load_time), new ListUtils.MapClosure<TestResult, Number>() {
             public Number eval(TestResult r) {
