@@ -3,7 +3,6 @@ package com.loadimpact.jenkins_plugin;
 import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.domains.DomainRequirement;
 import com.loadimpact.ApiTokenClient;
-import com.loadimpact.jenkins_plugin.client.LoadImpactClient;
 import com.loadimpact.eval.DelayUnit;
 import com.loadimpact.resource.TestConfiguration;
 import com.loadimpact.util.StringUtils;
@@ -12,9 +11,7 @@ import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 import org.kohsuke.stapler.QueryParameter;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 
 /**
