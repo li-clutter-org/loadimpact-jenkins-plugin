@@ -4,6 +4,9 @@ import com.loadimpact.eval.DelayUnit;
 import com.loadimpact.eval.LoadTestParameters;
 import com.loadimpact.eval.Threshold;
 import com.loadimpact.jenkins_plugin.LoadImpactCore;
+import com.loadimpact.jenkins_plugin.ThresholdView;
+
+import java.util.List;
 
 /**
  * DESCRIPTION
@@ -27,7 +30,15 @@ public class JenkinsLoadTestParameters implements LoadTestParameters {
     }
 
     public Threshold[] getThresholds() {
-        return null; //todo
+        List<ThresholdView> tvs = core.getThresholds();
+        Threshold[] thresholds = new Threshold[tvs.size()];
+        for (int i = 0; i < tvs.size(); i++) {
+            ThresholdView tv = tvs.get(i);
+            if (tv.value >= 0) {
+                thresholds[i] = new Threshold(i+1, tv.metric, tv.operator, tv.value, tv.result);
+            }
+        }
+        return thresholds;
     }
 
     public DelayUnit getDelayUnit() {

@@ -44,8 +44,6 @@ import static com.loadimpact.resource.testresult.StandardMetricResult.Metrics.*;
  * @date 2013-10-21, 09:06
  */
 public class LoadImpactCore {
-//    @Deprecated
-//    private static final String PLUGIN_NAME = "LoadImpact-Jenkins-plugin";
 
     /**
      * API token (credentials) ID.
@@ -158,11 +156,10 @@ public class LoadImpactCore {
         final PrintStream console = listener.getLogger();
         listener.started(Arrays.asList((Cause) new Cause.UserCause()));
 
-//        LoadImpactClient client = getLoadImpactClient();
         ApiTokenClient                  client           = getApiTokenClient();
         JenkinsLoadTestParameters       parameters       = new JenkinsLoadTestParameters(this);
         JenkinsLoadTestLogger           logger           = new JenkinsLoadTestLogger(console);
-        JenkinsLoadTestResultListener   resultListener   = new JenkinsLoadTestResultListener();
+        JenkinsLoadTestResultListener   resultListener   = new JenkinsLoadTestResultListener(build);
         LoadTestListener                loadTestListener = new LoadTestListener(parameters, logger, resultListener);
 
         TestConfiguration testConfiguration = client.getTestConfiguration(parameters.getTestConfigurationId());
@@ -183,30 +180,6 @@ public class LoadImpactCore {
             listener.error(Messages.LoadImpactCore_Failed(""));
             build.setResult(Result.FAILURE);
         }
-
-//        try {
-//            RunningTestListener progressMonitor = new RunningTestListenerImpl(this, build, listener);
-//            TestInstance testInstance = client.runTest(getLoadTestId(), pollInterval, progressMonitor);
-
-//            console.printf(Messages.LoadImpactCore_FetchingResult());
-//            Map<ResultsCategory, List<TestResult>> testResults = client.getTestResults(testInstance.id, user_load_time, requests_per_second, bandwidth, clients_active);
-//            TestResultAction testResultAction = new TestResultAction(build, testInstance, testResults);
-//            build.addAction(testResultAction);
-
-//            if (build.getResult() == null) {
-//                build.setResult(Result.SUCCESS);
-//            }
-//            return true;
-//        } catch (AbortException e) {
-//            listener.error(Messages.LoadImpactCore_Aborted(e.getMessage()));
-//            build.setResult(Result.ABORTED);
-//        } catch (Exception e) {
-//            log().log(Level.WARNING, String.format("Failed to execute HTTP REST call: %s", e), e);
-//            log().log(Level.WARNING, "Exception", e);
-//
-//            listener.error(Messages.LoadImpactCore_Failed(e));
-//            build.setResult(Result.FAILURE);
-//        }
 
         return false;
     }
@@ -301,12 +274,9 @@ public class LoadImpactCore {
             }
 
             try {
-//                TestConfiguration cfg = getLoadImpactClient().getTestConfiguration(getLoadTestId());
                 TestConfiguration tstCfg = getApiTokenClient().getTestConfiguration(getLoadTestId());
                 log().info(Messages.LoadImpactCore_FetchedConfig(tstCfg));
 
-//                String date = ISODateTimeFormat.date().print(cfg.date.getTime()) + " " + ISODateTimeFormat.timeNoMillis().print(cfg.date.getTime());
-                
                 int duration = ListUtils.reduce(tstCfg.loadSchedule, 0, new ListUtils.ReduceClosure<Integer, LoadScheduleStep>() {
                     public Integer eval(Integer sum, LoadScheduleStep s) {
                         return sum + s.duration;
@@ -317,10 +287,7 @@ public class LoadImpactCore {
                         return Math.max(max, s.users);
                     }
                 });
-//                List<LoadTestHeader.Zone> zones = new ArrayList<LoadTestHeader.Zone>();
-//                for (TestConfiguration.Track track : cfg.tracks) {
-//                    zones.add(new LoadTestHeader.Zone(track.zone, track.percent));
-//                }
+                
                 List<LoadTestHeader.Zone> zones = ListUtils.map(tstCfg.tracks, new ListUtils.MapClosure<LoadTrack, LoadTestHeader.Zone>() {
                     public LoadTestHeader.Zone eval(LoadTrack t) {
                         Integer percentage = ListUtils.reduce(t.clips, 0, new ListUtils.ReduceClosure<Integer, LoadClip>() {
@@ -353,26 +320,6 @@ public class LoadImpactCore {
         client.setDebug(isLogHttp());
         return client;
     }
-    
-
-    /**
-     * Creates a LoadImpact REST client.
-     * @return a client
-     */
-//    @Deprecated
-//    private LoadImpactClient getLoadImpactClient() {
-//        return new LoadImpactClient(getApiToken(), isLogHttp());
-//    }
-
-//    /**
-//     * Helper function that returns a proper image URL.
-//     * @param imgName   name of image file
-//     * @return jenkins URL
-//     */
-//    @Deprecated
-//    public static String imgUrl(final String imgName) {
-//        return Functions.getResourcePath() + "/plugin/" + PLUGIN_NAME + "/img/" + imgName;
-//    }
 
     /**
      * Reads the proper plugin name from the MANIFEST
