@@ -65,7 +65,7 @@
             <groupId>org.jenkins-ci.plugins</groupId>
             <artifactId>credentials</artifactId>
             <version>${credentials.version}</version>
-            <scope>provided</scope>
+            <scope>compile</scope>
         </dependency>
         
         <dependency>

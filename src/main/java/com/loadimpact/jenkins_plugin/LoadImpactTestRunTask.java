@@ -32,8 +32,8 @@ public class LoadImpactTestRunTask extends Builder {
 
 
     @DataBoundConstructor
-    public LoadImpactTestRunTask(String apiTokenId, int loadTestId, int criteriaDelayValue, String criteriaDelayUnit, int criteriaDelayQueueSize, boolean abortAtFailure, ThresholdView[] thresholdViews, int pollInterval, boolean logHttp, boolean logJson) {
-        this._core = new LoadImpactCore(apiTokenId, loadTestId, criteriaDelayValue, criteriaDelayUnit, criteriaDelayQueueSize, abortAtFailure, thresholdViews, pollInterval, logHttp, logJson);
+    public LoadImpactTestRunTask(String apiTokenId, int loadTestId, int criteriaDelayValue, String criteriaDelayUnit, int criteriaDelayQueueSize, boolean abortAtFailure, ThresholdView[] thresholds, int pollInterval, boolean logHttp, boolean logJson) {
+        this._core = new LoadImpactCore(apiTokenId, loadTestId, criteriaDelayValue, criteriaDelayUnit, criteriaDelayQueueSize, abortAtFailure, thresholds, pollInterval, logHttp, logJson);
         log().info("properties: " + core().toString());
     }
 
@@ -64,11 +64,6 @@ public class LoadImpactTestRunTask extends Builder {
         }
         return _log;
     }
-
-//    @Deprecated
-//    public static String imgUrl(final String imgName) {
-//        return LoadImpactCore.imgUrl(imgName);
-//    }
 
     @Override
     public String toString() {

@@ -2,8 +2,10 @@ package com.loadimpact.jenkins_plugin;
 
 import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.domains.DomainRequirement;
+import com.loadimpact.ApiTokenClient;
 import com.loadimpact.jenkins_plugin.client.LoadImpactClient;
 import com.loadimpact.eval.DelayUnit;
+import com.loadimpact.resource.TestConfiguration;
 import com.loadimpact.util.StringUtils;
 import hudson.model.Item;
 import hudson.util.FormValidation;
@@ -102,11 +104,18 @@ public class DescriptorCore {
         if (apiToken == null) return items;
 
         try {
-            LoadImpactClient client = new LoadImpactClient(apiToken);
-            Map<Integer, String> tests = client.getTestConfigurationLabels();
-            for (Map.Entry<Integer, String> t : tests.entrySet()) {
-                items.add(t.getValue(), t.getKey().toString());
+//            LoadImpactClient client = new LoadImpactClient(apiToken);
+            ApiTokenClient client = new ApiTokenClient(apiToken);
+            
+            List<TestConfiguration> testConfigurations = client.getTestConfigurations();
+            for (TestConfiguration cfg : testConfigurations) {
+                items.add(cfg.name, String.valueOf(cfg.id));
             }
+
+//            Map<Integer, String> tests = client.getTestConfigurationLabels();
+//            for (Map.Entry<Integer, String> t : tests.entrySet()) {
+//                items.add(t.getValue(), t.getKey().toString());
+//            }
         } catch (Exception e) {
             log.warning(String.format("Failed to retrieve test-configurations: %s", e));
         }
