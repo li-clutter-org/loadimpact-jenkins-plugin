@@ -38,7 +38,6 @@ public class JenkinsLoadTestResultListener implements LoadTestResultListener {
     }
 
     public void markAs(LoadTestResult loadTestResult, String reason) {
-
         if (loadTestResult == LoadTestResult.failed) {
             currentResult=new CurrentResult(loadTestResult, Result.FAILURE, reason);
         } else if (loadTestResult == LoadTestResult.unstable) {

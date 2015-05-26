@@ -5,7 +5,7 @@ import com.loadimpact.eval.LoadTestLogger;
 import java.io.PrintStream;
 
 /**
- * DESCRIPTION
+ * Wrapper around the jenkins console logger
  *
  * @user jens
  * @date 2014-04-27
@@ -30,7 +30,7 @@ public class JenkinsLoadTestLogger implements LoadTestLogger {
     }
 
     public void message(String fmt, Object... args) {
-        stream.printf(fmt, args);
+        stream.printf(fmt+"%n", args);
     }
 
     public void failure(String reason) {

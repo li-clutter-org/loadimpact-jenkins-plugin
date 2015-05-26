@@ -187,8 +187,8 @@ public class LoadImpactCore {
     TestResultAction populateTestResults(Test tst, ApiTokenClient client, AbstractBuild<?, ?> build) {
         String      name              = tst.title;
         String      testId            = String.valueOf(tst.id);
-        String      targetUrl         = tst.url.toString();
-        String      resultUrl         = tst.publicUrl.toString();
+        String      targetUrl         = toString(tst.url);
+        String      resultUrl         = toString(tst.publicUrl);
         String      elapsedTime       = computeElapsedTime(tst);
         String      responseTime      = computeResponseTime(tst, client);
         int         clientCount       = computeClientsCount(tst, client);
@@ -201,7 +201,11 @@ public class LoadImpactCore {
         
         return new TestResultAction(build, name, testId, targetUrl, resultUrl, elapsedTime, responseTime, requestCount, requestCountMax, bandwidthValue, bandwidthValueMax, clientCount);
     }
-    
+
+    String toString(Object s) {
+        if (s == null) return "";
+        return s.toString();
+    }
 
     String computeElapsedTime(Test tst) {
         return timeFmt().print(new Period(tst.started.getTime(), tst.ended.getTime()));
@@ -299,7 +303,7 @@ public class LoadImpactCore {
                     }
                 });
 
-                loadTestHeader = new LoadTestHeader(loadTestId, tstCfg.name, tstCfg.updated, tstCfg.url.toString(), duration, clients, tstCfg.userType.label, zones);
+                loadTestHeader = new LoadTestHeader(loadTestId, tstCfg.name, tstCfg.updated, toString(tstCfg.url), duration, clients, tstCfg.userType.label, zones);
             } catch (Exception e) {
                 return new LoadTestHeader(loadTestId, "Error: "+e.toString(), new Date(), "", 0, 0, "", null);
             }
