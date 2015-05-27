@@ -7,7 +7,13 @@
         <artifactId>plugin</artifactId>
         <version>1.610</version>
     </parent>
-
+    
+    <name>LoadImpact Jenkins plugin</name>
+    <groupId>com.loadimpact</groupId>
+    <artifactId>LoadImpact-Jenkins-plugin</artifactId>
+    <version>1.4</version>
+    <packaging>hpi</packaging>
+    
     <!--<profiles>
         <profile>
             <id>jenkins</id>
@@ -21,20 +27,13 @@
         </profile>
     </profiles>-->
 
-    <name>LoadImpact Jenkins plugin</name>
-    <groupId>com.loadimpact</groupId>
-    <artifactId>LoadImpact-Jenkins-plugin</artifactId>
-    <version>1.4</version>
-    <packaging>hpi</packaging>
-
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>1.6</java.version>
-        <!--<maven-hpi-plugin.version>1.96</maven-hpi-plugin.version>-->
-        <credentials.version>1.22</credentials.version>
         
         <loadimpact.sdk.version>1.4</loadimpact.sdk.version>
         
+        <credentials.version>1.22</credentials.version>
         <jersey.version>2.17</jersey.version>
         <joda.version>2.7</joda.version>
         <junit.version>4.12</junit.version>
@@ -45,6 +44,11 @@
         <repository>
             <id>repo.jenkins-ci.org</id>
             <url>http://repo.jenkins-ci.org/public/</url>
+        </repository>
+
+        <repository>
+            <id>bintray</id>
+            <url>http://dl.bintray.com/ribomation/maven/</url>
         </repository>
     </repositories>
 
@@ -59,7 +63,6 @@
     <dependencies>
         <dependency>
             <groupId>com.loadimpact</groupId>
-            <!--<artifactId>Load-Impact-Java-SDK</artifactId>-->
             <artifactId>loadimpact-sdk-java</artifactId>
             <version>${loadimpact.sdk.version}</version>
             <classifier>withDepends</classifier>
@@ -71,29 +74,6 @@
             <version>${credentials.version}</version>
             <scope>compile</scope>
         </dependency>
-
-        <!--
-                <dependency>
-                    <groupId>org.glassfish.jersey.core</groupId>
-                    <artifactId>jersey-client</artifactId>
-                    <version>${jersey.version}</version>
-                    <scope>compile</scope>
-                </dependency>
-        
-                <dependency>
-                    <groupId>org.glassfish.jersey.media</groupId>
-                    <artifactId>jersey-media-multipart</artifactId>
-                    <version>${jersey.version}</version>
-                    <scope>compile</scope>
-                </dependency>
-                
-                <dependency>
-                    <groupId>org.glassfish.jersey.media</groupId>
-                    <artifactId>jersey-media-json-processing</artifactId>
-                    <version>${jersey.version}</version>
-                    <scope>compile</scope>
-                </dependency>
-        -->
 
         <dependency>
             <groupId>joda-time</groupId>
