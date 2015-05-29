@@ -208,7 +208,10 @@ public class LoadImpactCore {
     }
 
     String computeElapsedTime(Test tst) {
-        return timeFmt().print(new Period(tst.started.getTime(), tst.ended.getTime()));
+        if (tst.started != null && tst.ended != null) {
+            return timeFmt().print(new Period(tst.started.getTime(), tst.ended.getTime()));
+        }
+        return "";
     }
 
     @SuppressWarnings("unchecked")

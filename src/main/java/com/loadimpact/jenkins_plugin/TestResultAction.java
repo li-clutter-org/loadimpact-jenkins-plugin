@@ -1,5 +1,6 @@
 package com.loadimpact.jenkins_plugin;
 
+import com.loadimpact.util.StringUtils;
 import hudson.model.AbstractBuild;
 import hudson.model.Action;
 import org.joda.time.format.PeriodFormatter;
@@ -78,19 +79,6 @@ public class TestResultAction implements Action {
         this.clientCount = clientCount;
     }
 
-    private PeriodFormatter timeFmt() {
-        return new PeriodFormatterBuilder()
-                .minimumPrintedDigits(0)
-                .printZeroNever()
-                .appendHours()
-                .appendSeparator("h ")
-                .appendMinutes()
-                .appendSeparator("m ")
-                .appendSeconds()
-                .appendSuffix("s")
-                .toFormatter();
-    }
-
     public AbstractBuild<?, ?> getBuild() {
         return build;
     }
@@ -124,7 +112,7 @@ public class TestResultAction implements Action {
     }
 
     public boolean getHasResult() {
-        return resultUrl != null;
+        return !StringUtils.isBlank(resultUrl);
     }
 
     public String getElapsedTime() {
@@ -167,5 +155,4 @@ public class TestResultAction implements Action {
         return LoadImpactCore.cssPath("style.css");
     }
     
-
 }
