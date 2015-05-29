@@ -2,6 +2,7 @@ package com.loadimpact.jenkins_plugin;
 
 import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.domains.DomainRequirement;
+import com.jcabi.manifests.Manifests;
 import com.loadimpact.ApiTokenClient;
 import com.loadimpact.eval.DelayUnit;
 import com.loadimpact.eval.LoadTestListener;
@@ -26,11 +27,9 @@ import org.joda.time.format.PeriodFormatter;
 import org.joda.time.format.PeriodFormatterBuilder;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintStream;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Logger;
 
 import static com.loadimpact.resource.testresult.StandardMetricResult.Metrics.*;
@@ -105,6 +104,8 @@ public class LoadImpactCore {
      */
     private transient LoadTestHeader loadTestHeader;
 
+    private transient String agentRequestHeaderValue;
+
 
     public LoadImpactCore(String apiTokenId, int loadTestId, int criteriaDelayValue, String criteriaDelayUnit, int criteriaDelayQueueSize, boolean abortAtFailure, ThresholdView[] thresholdViews, int pollInterval, boolean logHttp, boolean logJson) {
         this.apiTokenId = apiTokenId;
@@ -144,31 +145,32 @@ public class LoadImpactCore {
 
     /**
      * Launches and monitors the load test.
-     * @param build     jenkins build instance
-     * @param launcher  jenkins launcher
-     * @param listener  jenkins listener
+     *
+     * @param build    jenkins build instance
+     * @param launcher jenkins launcher
+     * @param listener jenkins listener
      * @return true if successful
-     * @throws InterruptedException     if a waiting thread was interrupted
-     * @throws IOException  if some I/O went wrong
+     * @throws InterruptedException if a waiting thread was interrupted
+     * @throws IOException          if some I/O went wrong
      */
     @SuppressWarnings("UnusedParameters")
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
         final PrintStream console = listener.getLogger();
         listener.started(Arrays.asList((Cause) new Cause.UserCause()));
 
-        ApiTokenClient                  client           = getApiTokenClient();
-        JenkinsLoadTestParameters       parameters       = new JenkinsLoadTestParameters(this);
-        JenkinsLoadTestLogger           logger           = new JenkinsLoadTestLogger(console);
-        JenkinsLoadTestResultListener   resultListener   = new JenkinsLoadTestResultListener(build);
-        LoadTestListener                loadTestListener = new LoadTestListener(parameters, logger, resultListener);
+        ApiTokenClient                client           = getApiTokenClient();
+        JenkinsLoadTestParameters     parameters       = new JenkinsLoadTestParameters(this);
+        JenkinsLoadTestLogger         logger           = new JenkinsLoadTestLogger(console);
+        JenkinsLoadTestResultListener resultListener   = new JenkinsLoadTestResultListener(build);
+        LoadTestListener              loadTestListener = new LoadTestListener(parameters, logger, resultListener);
 
         TestConfiguration testConfiguration = client.getTestConfiguration(parameters.getTestConfigurationId());
         loadTestListener.onSetup(testConfiguration, client);
 
         logger.message("Launching the load test");
-        int     testId = client.startTest(testConfiguration.id);
-        Test    test   = client.monitorTest(testId,  parameters.getPollInterval(), loadTestListener);
-        
+        int  testId = client.startTest(testConfiguration.id);
+        Test test   = client.monitorTest(testId, parameters.getPollInterval(), loadTestListener);
+
         if (test != null && !resultListener.isNonSuccessful()) {
             logger.message(Messages.LoadImpactCore_FetchingResult());
             TestResultAction testResultAction = populateTestResults(test, client, build);
@@ -185,20 +187,20 @@ public class LoadImpactCore {
     }
 
     TestResultAction populateTestResults(Test tst, ApiTokenClient client, AbstractBuild<?, ?> build) {
-        String      name              = tst.title;
-        String      testId            = String.valueOf(tst.id);
-        String      targetUrl         = toString(tst.url);
-        String      resultUrl         = toString(tst.publicUrl);
-        String      elapsedTime       = computeElapsedTime(tst);
-        String      responseTime      = computeResponseTime(tst, client);
-        int         clientCount       = computeClientsCount(tst, client);
-        int[]       reqCnt            = computeRequestsCount(tst, client);
-        int         requestCount      = reqCnt[0];
-        int         requestCountMax   = reqCnt[1];
-        double[]    bw                = computeBandwidth(tst, client);
-        double      bandwidthValue    = bw[0];
-        double      bandwidthValueMax = bw[1];
-        
+        String   name              = tst.title;
+        String   testId            = String.valueOf(tst.id);
+        String   targetUrl         = toString(tst.url);
+        String   resultUrl         = toString(tst.publicUrl);
+        String   elapsedTime       = computeElapsedTime(tst);
+        String   responseTime      = computeResponseTime(tst, client);
+        int      clientCount       = computeClientsCount(tst, client);
+        int[]    reqCnt            = computeRequestsCount(tst, client);
+        int      requestCount      = reqCnt[0];
+        int      requestCountMax   = reqCnt[1];
+        double[] bw                = computeBandwidth(tst, client);
+        double   bandwidthValue    = bw[0];
+        double   bandwidthValueMax = bw[1];
+
         return new TestResultAction(build, name, testId, targetUrl, resultUrl, elapsedTime, responseTime, requestCount, requestCountMax, bandwidthValue, bandwidthValueMax, clientCount);
     }
 
@@ -218,7 +220,9 @@ public class LoadImpactCore {
     String computeResponseTime(Test tst, ApiTokenClient client) {
         List<StandardMetricResult> results = (List<StandardMetricResult>) client.getStandardMetricResults(tst.id, USER_LOAD_TIME, null, null);
         List<Double> values = ListUtils.map(results, new ListUtils.MapClosure<StandardMetricResult, Double>() {
-            public Double eval(StandardMetricResult r) { return r.value.doubleValue(); }
+            public Double eval(StandardMetricResult r) {
+                return r.value.doubleValue();
+            }
         });
         return timeFmt().print(new Period((long) ListUtils.average(values)));
     }
@@ -227,7 +231,9 @@ public class LoadImpactCore {
     Integer computeClientsCount(Test tst, ApiTokenClient client) {
         List<StandardMetricResult> results = (List<StandardMetricResult>) client.getStandardMetricResults(tst.id, CLIENTS_ACTIVE, null, null);
         List<Integer> values = ListUtils.map(results, new ListUtils.MapClosure<StandardMetricResult, Integer>() {
-            public Integer eval(StandardMetricResult r) { return r.value.intValue(); }
+            public Integer eval(StandardMetricResult r) {
+                return r.value.intValue();
+            }
         });
         return Collections.max(values);
     }
@@ -236,7 +242,9 @@ public class LoadImpactCore {
     int[] computeRequestsCount(Test tst, ApiTokenClient client) {
         List<StandardMetricResult> results = (List<StandardMetricResult>) client.getStandardMetricResults(tst.id, REQUESTS_PER_SECOND, null, null);
         List<Double> values = ListUtils.map(results, new ListUtils.MapClosure<StandardMetricResult, Double>() {
-            public Double eval(StandardMetricResult r) { return r.value.doubleValue(); }
+            public Double eval(StandardMetricResult r) {
+                return r.value.doubleValue();
+            }
         });
         int avg = (int) ListUtils.average(values);
         int max = Collections.max(values).intValue();
@@ -247,7 +255,9 @@ public class LoadImpactCore {
     double[] computeBandwidth(Test tst, ApiTokenClient client) {
         List<StandardMetricResult> results = (List<StandardMetricResult>) client.getStandardMetricResults(tst.id, BANDWIDTH, null, null);
         List<Double> values = ListUtils.map(results, new ListUtils.MapClosure<StandardMetricResult, Double>() {
-            public Double eval(StandardMetricResult r) { return r.value.doubleValue(); }
+            public Double eval(StandardMetricResult r) {
+                return r.value.doubleValue();
+            }
         });
         double avg = ListUtils.average(values) / 1E6;
         double max = Collections.max(values).intValue() / 1E6;
@@ -269,7 +279,8 @@ public class LoadImpactCore {
 
     /**
      * Creates and returns the load test meta data for the summary.
-     * @param project  jenkins project
+     *
+     * @param project jenkins project
      * @return jenkins action
      */
     @SuppressWarnings("UnusedParameters")
@@ -294,7 +305,7 @@ public class LoadImpactCore {
                         return Math.max(max, s.users);
                     }
                 });
-                
+
                 List<LoadTestHeader.Zone> zones = ListUtils.map(tstCfg.tracks, new ListUtils.MapClosure<LoadTrack, LoadTestHeader.Zone>() {
                     public LoadTestHeader.Zone eval(LoadTrack t) {
                         Integer percentage = ListUtils.reduce(t.clips, 0, new ListUtils.ReduceClosure<Integer, LoadClip>() {
@@ -308,7 +319,7 @@ public class LoadImpactCore {
 
                 loadTestHeader = new LoadTestHeader(loadTestId, tstCfg.name, tstCfg.updated, toString(tstCfg.url), duration, clients, tstCfg.userType.label, zones);
             } catch (Exception e) {
-                return new LoadTestHeader(loadTestId, "Error: "+e.toString(), new Date(), "", 0, 0, "", null);
+                return new LoadTestHeader(loadTestId, "Error: " + e.toString(), new Date(), "", 0, 0, "", null);
             }
         }
         return loadTestHeader;
@@ -316,6 +327,7 @@ public class LoadImpactCore {
 
     /**
      * Returns the load test description.
+     *
      * @return jenkins action
      */
     public LoadTestHeader getLoadTestHeader() {
@@ -325,11 +337,42 @@ public class LoadImpactCore {
     private ApiTokenClient getApiTokenClient() {
         ApiTokenClient client = new ApiTokenClient(getApiToken());
         client.setDebug(isLogHttp());
+        client.setAgentRequestHeaderValue(getAgentRequestHeaderValue());
         return client;
+    }
+
+    public Properties getMavenPomData() {
+        Properties  p       = new Properties();
+        String      pomFile = "/META-INF/maven/com.loadimpact/LoadImpact-Jenkins-plugin/pom.properties";
+        InputStream is      = getClass().getResourceAsStream(pomFile);
+        if (is != null) {
+            try {
+                p.load(is);
+            } catch (IOException ignore) {
+            }
+        }
+        return p;
+    }
+
+    public String getAgentRequestHeaderValue() {
+//        log().info("**** MANIFEST ****");
+//        Set<Map.Entry<String, String>> entries = Manifests.DEFAULT.entrySet();
+//        for (Map.Entry<String, String> e : entries) {
+//            log().info("  ** " + e.getKey() + "=" + e.getValue());
+//        }
+
+        if (agentRequestHeaderValue == null) {
+            String pluginVersion = getMavenPomData().getProperty("version", "0.0.0");
+            String jenkinsVersion = Jenkins.getVersion().toString();
+            agentRequestHeaderValue = String.format("LoadImpactJenkinsPlugin/%s Jenkins/%s", pluginVersion, jenkinsVersion);
+        }
+
+        return agentRequestHeaderValue;
     }
 
     /**
      * Reads the proper plugin name from the MANIFEST
+     *
      * @return its name
      */
     public static String getPluginName() {
@@ -344,6 +387,7 @@ public class LoadImpactCore {
 
     /**
      * Returns a proper url path for a bundled image.
+     *
      * @param name its bare file name
      * @return its path
      */
@@ -353,16 +397,18 @@ public class LoadImpactCore {
 
     /**
      * Returns a proper url path for a bundled style sheet.
+     *
      * @param name its bare file name
      * @return its path
      */
     public static String cssPath(final String name) {
         return String.format("%s/plugin/%s/css/%s", Functions.getResourcePath(), getPluginName(), name);
     }
-    
+
 
     /**
      * Returns its logger.
+     *
      * @return logger
      */
     public static Logger log() {
@@ -371,7 +417,7 @@ public class LoadImpactCore {
         }
         return _log;
     }
-    
+
     @Override
     public String toString() {
         return "LoadImpact{" +
