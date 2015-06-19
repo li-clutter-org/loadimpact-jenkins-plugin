@@ -14,19 +14,6 @@
     <version>1.4.0</version>
     <packaging>hpi</packaging>
     
-    <!--<profiles>
-        <profile>
-            <id>jenkins</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            &lt;!&ndash; 
-            You need to define the jenkins profile in ~/.m2/settings.xml
-            See the README.md for further details.
-            &ndash;&gt;
-        </profile>
-    </profiles>-->
-
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>1.6</java.version>
@@ -48,7 +35,7 @@
 
         <repository>
             <id>bintray</id>
-            <url>http://dl.bintray.com/ribomation/maven/</url>
+            <url>http://dl.bintray.com/loadimpact/loadimpact-sdk-java</url>
         </repository>
     </repositories>
 
