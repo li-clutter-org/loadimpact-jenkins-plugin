@@ -2,7 +2,6 @@ package com.loadimpact.jenkins_plugin;
 
 import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.domains.DomainRequirement;
-import com.jcabi.manifests.Manifests;
 import com.loadimpact.ApiTokenClient;
 import com.loadimpact.eval.DelayUnit;
 import com.loadimpact.eval.LoadTestListener;
@@ -34,7 +33,6 @@ import java.util.logging.Logger;
 
 import static com.loadimpact.resource.testresult.StandardMetricResult.Metrics.*;
 
-//import com.loadimpact.jenkins_plugin.client.TestConfiguration;
 
 /**
  * Common parts of this plugin, used by both the build and post-build tasks.
@@ -355,18 +353,11 @@ public class LoadImpactCore {
     }
 
     public String getAgentRequestHeaderValue() {
-//        log().info("**** MANIFEST ****");
-//        Set<Map.Entry<String, String>> entries = Manifests.DEFAULT.entrySet();
-//        for (Map.Entry<String, String> e : entries) {
-//            log().info("  ** " + e.getKey() + "=" + e.getValue());
-//        }
-
         if (agentRequestHeaderValue == null) {
             String pluginVersion = getMavenPomData().getProperty("version", "0.0.0");
             String jenkinsVersion = Jenkins.getVersion().toString();
             agentRequestHeaderValue = String.format("LoadImpactJenkinsPlugin/%s Jenkins/%s", pluginVersion, jenkinsVersion);
         }
-
         return agentRequestHeaderValue;
     }
 
