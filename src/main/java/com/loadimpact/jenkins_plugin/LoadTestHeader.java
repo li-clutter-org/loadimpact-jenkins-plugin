@@ -69,7 +69,7 @@ public class LoadTestHeader implements ProminentProjectAction {
     }
 
     public String getTestConfigurationUrl() {
-        return "https://loadimpact.com/test/config/edit/" + getId();
+        return "https://app.loadimpact.com/tests/" + getId();
     }
 
     public Date getLastUpdated() {

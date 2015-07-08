@@ -6,12 +6,19 @@
         <tbody>
             <tr>
                 <th colspan="2" class="transparent">
-                    <h2><img src="${it.logo}" width="150"/> Summary</h2>
+                    <img src="${it.logo}" width="150"/>
+                    &nbsp;&nbsp;&nbsp;
+                    <a href="https://app.loadimpact.com/" target="_blank">[LOGIN]</a>
                 </th>
             </tr>
-            <tr tooltip="The name and ID of this load test">
+            <tr>
+                <th colspan="2" class="transparent">
+                    <h2>Summary</h2>
+                </th>
+            </tr>
+            <tr tooltip="The name of this load test">
                 <th>Name</th>
-                <td><a href="${it.testConfigurationUrl}" target="_blank">${it.name} (ID ${it.id})</a></td>
+                <td><a href="${it.testConfigurationUrl}" target="_blank">${it.name}</a>  [${it.id}]</td>
             </tr>
             <tr tooltip="Which website to direct the load test to.">
                 <th>Target</th>
@@ -38,6 +45,10 @@
             <tr tooltip="The peak (average) bandwidth consumption throughout test.">
                 <th>Bandwidth</th>
                 <td>${it.bandwidthMax} (${it.bandwidth}) Mbit per seconds</td>
+            </tr>
+            <tr tooltip="All results data at Load Impact">
+                <th>All Results</th>
+                <td><a href="${it.resultUrl}" target="_blank">VIEW @ Load Impact</a></td>
             </tr>
         </tbody>
     </table>

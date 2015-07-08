@@ -5,13 +5,17 @@
         <table class="test-config">
             <tr>
                 <th colspan="2" class="transparent">
-                    <h2>
-                        <img src="${it.logo}" width="150"/>
-                        Configuration
-                    </h2>
+                    <img src="${it.logo}" width="150"/>
+                    &nbsp;&nbsp;&nbsp;
+                    <a href="https://app.loadimpact.com/" target="_blank">[LOGIN]</a>
                 </th>
             </tr>
-            
+            <tr>
+                <th colspan="2" class="transparent">
+                    <h2>Configuration</h2>
+                </th>
+            </tr>
+
             <j:if test="${it.undefinedApiToken}">
                 <tr>
                     <td colspan="2" class="error-box">
@@ -28,9 +32,7 @@
             <j:if test="${it.hasApiToken}">
                 <tr>
                     <th>Name</th>
-                    <td>
-                        <a href="${it.testConfigurationUrl}" target="_blank">${it.name} (ID ${it.id})</a>
-                    </td>
+                    <td><a href="${it.testConfigurationUrl}" target="_blank">${it.name}</a> [${it.id}]</td>
                 </tr>
                 <tr>
                     <th>Last Updated</th>
@@ -38,9 +40,7 @@
                 </tr>
                 <tr>
                     <th>Target URL</th>
-                    <td>
-                        <a href="${it.targetUrl}">${it.targetUrl}</a>
-                    </td>
+                    <td><a href="${it.targetUrl}">${it.targetUrl}</a></td>
                 </tr>
                 <tr>
                     <th>Duration</th>

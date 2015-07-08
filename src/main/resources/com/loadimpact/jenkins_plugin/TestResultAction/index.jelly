@@ -6,7 +6,13 @@
         <l:main-panel>
             <h1>Load Impact Test Result</h1>
             <j:if test="${!it.hasResult}">
-                <div>Test not finished or invalid</div>
+                <div>
+                    No public test results available. 
+                </div>
+                <div>
+                    Please, login to your Load Impact account.
+                    <a href="${it.resultUrl}" target="_blank">Login Here</a>
+                </div>
             </j:if>
             <j:if test="${it.hasResult}">
                 <iframe id="testResultFrame" border="0" width="100%" height="900" src="${it.resultUrl}">

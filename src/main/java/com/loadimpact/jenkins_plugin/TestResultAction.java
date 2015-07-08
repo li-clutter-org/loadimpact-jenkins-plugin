@@ -3,8 +3,6 @@ package com.loadimpact.jenkins_plugin;
 import com.loadimpact.util.StringUtils;
 import hudson.model.AbstractBuild;
 import hudson.model.Action;
-import org.joda.time.format.PeriodFormatter;
-import org.joda.time.format.PeriodFormatterBuilder;
 
 /**
  * Provides the summary table and the link to the LoadImpact results page, at build instance.
@@ -24,10 +22,11 @@ public class TestResultAction implements Action {
      */
     private final String name;
 
+    private       String testConfigId;
     /**
-     * Its id.
+     * Its d.
      */
-    private final String id;
+    private final String testRunId;
 
     /**
      * URL of the load-test target..
@@ -64,10 +63,11 @@ public class TestResultAction implements Action {
      */
     private int clientCount;
 
-    public TestResultAction(AbstractBuild<?, ?> build, String name, String id, String targetUrl, String resultUrl, String elapsedTime, String responseTime, int requestCount, int requestCountMax, double bandwidth, double bandwidthMax, int clientCount) {
+    public TestResultAction(AbstractBuild<?, ?> build, String name, String testConfigId, String testRunId, String targetUrl, String resultUrl, String elapsedTime, String responseTime, int requestCount, int requestCountMax, double bandwidth, double bandwidthMax, int clientCount) {
         this.build = build;
         this.name = name;
-        this.id = id;
+        this.testConfigId = testConfigId;
+        this.testRunId = testRunId;
         this.targetUrl = targetUrl;
         this.resultUrl = resultUrl;
         this.elapsedTime = elapsedTime;
@@ -88,15 +88,24 @@ public class TestResultAction implements Action {
     }
 
     public String getId() {
-        return id;
+        return testRunId;
+    }
+
+    public String getTestConfigurationUrl() {
+        return "https://app.loadimpact.com/tests/" + testConfigId;
     }
 
     public String getTargetUrl() {
         return targetUrl;
     }
 
-    public String getTestConfigurationUrl() {
-        return "https://loadimpact.com/test/config/edit/" + getId();
+    public String getResultUrl() {
+        if (getHasResult()) {
+            return resultUrl + "/embed";
+        } else {
+            //return "https://app.loadimpact.com/tests/" + testRunId;
+            return getTestConfigurationUrl();
+        }
     }
 
     public String getBandwidth() {
@@ -105,10 +114,6 @@ public class TestResultAction implements Action {
 
     public String getBandwidthMax() {
         return String.format("%.2f", bandwidthMax);
-    }
-
-    public String getResultUrl() {
-        return resultUrl + "/embed";
     }
 
     public boolean getHasResult() {
@@ -126,7 +131,7 @@ public class TestResultAction implements Action {
     public int getRequestCount() {
         return requestCount;
     }
-    
+
     public int getRequestCountMax() {
         return requestCountMax;
     }
@@ -154,5 +159,5 @@ public class TestResultAction implements Action {
     public String getStyle() {
         return LoadImpactCore.cssPath("style.css");
     }
-    
+
 }

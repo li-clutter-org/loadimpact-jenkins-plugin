@@ -171,7 +171,7 @@ public class LoadImpactCore {
 
         if (test != null && !resultListener.isNonSuccessful()) {
             logger.message(Messages.LoadImpactCore_FetchingResult());
-            TestResultAction testResultAction = populateTestResults(test, client, build);
+            TestResultAction testResultAction = populateTestResults(testConfiguration, test, client, build);
             build.addAction(testResultAction);
             if (build.getResult() == null) build.setResult(Result.SUCCESS);
 
@@ -184,22 +184,24 @@ public class LoadImpactCore {
         return false;
     }
 
-    TestResultAction populateTestResults(Test tst, ApiTokenClient client, AbstractBuild<?, ?> build) {
-        String   name              = tst.title;
-        String   testId            = String.valueOf(tst.id);
-        String   targetUrl         = toString(tst.url);
-        String   resultUrl         = toString(tst.publicUrl);
-        String   elapsedTime       = computeElapsedTime(tst);
-        String   responseTime      = computeResponseTime(tst, client);
-        int      clientCount       = computeClientsCount(tst, client);
-        int[]    reqCnt            = computeRequestsCount(tst, client);
+    TestResultAction populateTestResults(TestConfiguration testConfig, Test testRun, ApiTokenClient client, AbstractBuild<?, ?> build) {
+        String   name              = testRun.title;
+        String   testConfigId      = String.valueOf(testConfig.id);
+        String   testRunId         = String.valueOf(testRun.id);
+        String   targetUrl         = toString(testRun.url);
+        String   resultUrl         = toString(testRun.publicUrl);
+        String   elapsedTime       = computeElapsedTime(testRun);
+        String   responseTime      = computeResponseTime(testRun, client);
+        int      clientCount       = computeClientsCount(testRun, client);
+        int[]    reqCnt            = computeRequestsCount(testRun, client);
         int      requestCount      = reqCnt[0];
         int      requestCountMax   = reqCnt[1];
-        double[] bw                = computeBandwidth(tst, client);
+        double[] bw                = computeBandwidth(testRun, client);
         double   bandwidthValue    = bw[0];
         double   bandwidthValueMax = bw[1];
 
-        return new TestResultAction(build, name, testId, targetUrl, resultUrl, elapsedTime, responseTime, requestCount, requestCountMax, bandwidthValue, bandwidthValueMax, clientCount);
+        return new TestResultAction(build, name, testConfigId, testRunId, targetUrl, resultUrl,
+                elapsedTime, responseTime, requestCount, requestCountMax, bandwidthValue, bandwidthValueMax, clientCount);
     }
 
     String toString(Object s) {
