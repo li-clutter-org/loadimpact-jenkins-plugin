@@ -103,8 +103,8 @@ public class TestResultAction implements Action {
         if (getHasResult()) {
             return resultUrl + "/embed";
         } else {
-            //return "https://app.loadimpact.com/tests/" + testRunId;
-            return getTestConfigurationUrl();
+            return "https://app.loadimpact.com/test-runs/" + testRunId;
+//            return getTestConfigurationUrl();
         }
     }
 

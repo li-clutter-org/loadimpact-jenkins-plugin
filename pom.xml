@@ -11,7 +11,7 @@
     <name>LoadImpact Jenkins plugin</name>
     <groupId>com.loadimpact</groupId>
     <artifactId>LoadImpact-Jenkins-plugin</artifactId>
-    <version>1.4.1</version>
+    <version>1.4.2</version>
     <packaging>hpi</packaging>
     
     <properties>

@@ -50,6 +50,9 @@ a.login, a.login:link, a.login:visited {
     margin-left: 2em;
 }
 
+a.view-result {
+    text-decoration: none;
+}
 
 /*******************************************************
  * Copied from Bootstrap 3

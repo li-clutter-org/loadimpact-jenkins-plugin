@@ -7,14 +7,14 @@
             <h1>Load Impact Test Result</h1>
             <j:if test="${!it.hasResult}">
                 <div>
-                    No public test results available. 
+                    No public test results URL available. 
                 </div>
                 <div>
                     <img src="${it.logo}" width="150" />
                 </div>
                 <div>
                     Please, login to your Load Impact account.<br/>
-                    <a href="${it.resultUrl}" target="_blank" class="login btn btn-success btn-sm">LOGIN</a>
+                    <a href="${it.resultUrl}" target="_blank" class="view-result btn btn-success btn-sm">View Test Result @ Load Impact</a>
                 </div>
             </j:if>
             <j:if test="${it.hasResult}">
