@@ -10,8 +10,11 @@
                     No public test results available. 
                 </div>
                 <div>
-                    Please, login to your Load Impact account.
-                    <a href="${it.resultUrl}" target="_blank">Login Here</a>
+                    <img src="${it.logo}" width="150" />
+                </div>
+                <div>
+                    Please, login to your Load Impact account.<br/>
+                    <a href="${it.resultUrl}" target="_blank" class="login btn btn-success btn-sm">LOGIN</a>
                 </div>
             </j:if>
             <j:if test="${it.hasResult}">

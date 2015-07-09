@@ -7,8 +7,8 @@
             <tr>
                 <th colspan="2" class="transparent">
                     <img src="${it.logo}" width="150"/>
-                    &nbsp;&nbsp;&nbsp;
-                    <a href="https://app.loadimpact.com/" target="_blank">[LOGIN]</a>
+                    
+                    <a href="https://app.loadimpact.com/" target="_blank" class="login btn btn-success btn-sm">LOGIN</a>
                 </th>
             </tr>
             <tr>
