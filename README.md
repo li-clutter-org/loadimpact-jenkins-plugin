@@ -1,3 +1,7 @@
+# !!! THIS PLUGIN IS DEPRECATED !!!
+
+**The Load Impact SaaS service is deprecated and will be end-of-lifed at December 31st, 2020. It has been superceded by [k6](https://github.com/loadimpact/k6) and [k6 Cloud](https://k6.io/cloud).**
+
 Load Impact Jenkins plugin
 =========================
 
